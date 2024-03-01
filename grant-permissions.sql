@@ -38,3 +38,5 @@ GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'midoriyai'@'localho
 -- underlying tables ('beyblades' table)
 GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'gokus'@'localhost';
 GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'midoriyai'@'localhost';
+
+FLUSH PRIVILEGES;
