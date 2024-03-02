@@ -33,7 +33,8 @@ def get_conn():
           # SHOW VARIABLES WHERE variable_name LIKE 'port';
           port='3306',  # this may change!
           password='jlavinpw',
-          database='beybladedb' # replace this with your database name
+          database='beybladedb', # replace this with your database name
+          allow_local_infile=True
         )
         print('Successfully connected.')
         return conn

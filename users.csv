@@ -1,6 +1,6 @@
 user_ID,username,email,is_admin,date_joined
-101,Jonayet Lavin,jlavin@caltech.edu,Yes,2020-12-02 2:42:26
-102,Alina Zhang,alinazhang@caltech.edu,Yes,2019-03-03 4:16:02
-103,Deepro Pasha,dpasha@caltech.edu,Yes,2020-07-29 6:21:10
-104,Son Goku,gokus@gmail.com,No,2021-06-18 21:48:37
-105,Izuku Midoriya,midoriyai@gmail.com,No,2019-11-09 9:43:34
+101,Jonayet Lavin,jlavin@caltech.edu,1,2020-12-02 2:42:26
+102,Alina Zhang,alinazhang@caltech.edu,1,2019-03-03 4:16:02
+103,Deepro Pasha,dpasha@caltech.edu,1,2020-07-29 6:21:10
+104,Son Goku,gokus@gmail.com,0,2021-06-18 21:48:37
+105,Izuku Midoriya,midoriyai@gmail.com,0,2019-11-09 9:43:34
