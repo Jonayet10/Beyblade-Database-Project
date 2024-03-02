@@ -36,7 +36,7 @@ DELIMITER ;
 -- You may extend that table to include an is_admin or role attribute if you
 -- have admin or other roles for users in your application
 -- (e.g. store managers, data managers, etc.)
-CREATE TABLE user_info (
+CREATE TABLE users (
     -- Usernames are up to 20 characters.
     username VARCHAR(20) PRIMARY KEY,
 
@@ -48,24 +48,34 @@ CREATE TABLE user_info (
     -- represented as 2 characters.  Thus, 256 / 8 * 2 = 64.
     -- We can use BINARY or CHAR here; BINARY simply has a different
     -- definition for comparison/sorting than CHAR.
-    password_hash BINARY(64) NOT NULL
+    password_hash BINARY(64) NOT NULL,
+
+    is_admin BOOLEAN NOT NULL,
+    -- The date and time the user joined
+    date_joined DATETIME NOT NULL
 );
 
--- Adds a new user to the user_info table, using the specified password (max
+-- Adds a new user to the users table, using the specified password (max
 -- of 20 characters). Salts the password with a newly-generated salt value,
 -- and then the salt and hash values are both stored in the table.
 DELIMITER !
-CREATE PROCEDURE sp_add_user(new_username VARCHAR(20), password VARCHAR(20))
+CREATE PROCEDURE sp_add_user(
+    new_username VARCHAR(20), 
+    password VARCHAR(20), 
+    new_is_admin BOOLEAN, 
+    new_date_joined DATETIME
+)
 BEGIN
-  DECLARE salt CHAR(8);
-  SET salt = make_salt(8);
-  INSERT INTO user_info
-    VALUES (new_username, salt, SHA2(CONCAT(salt, password), 256));
+    DECLARE salt CHAR(8);
+    SET salt = make_salt(8);
+    INSERT INTO users (username, salt, password_hash, is_admin, date_joined)
+    VALUES (new_username, salt, SHA2(CONCAT(salt, password), 256), new_is_admin, new_date_joined);
 END !
 DELIMITER ;
 
+
 -- Authenticates the specified username and password against the data
--- in the user_info table.  Returns 1 if the user appears in the table, and the
+-- in the users table.  Returns 1 if the user appears in the table, and the
 -- specified password hashes to the value for the user. Otherwise returns 0.
 DELIMITER !
 CREATE FUNCTION authenticate(username VARCHAR(20), password VARCHAR(20))
@@ -78,19 +88,19 @@ BEGIN
   -- Stores user's actual password
   DECLARE actual_password CHAR(64);
 
-  -- If username does not appear in user_info, return 0
-  IF username NOT IN (SELECT username FROM user_info) THEN 
+  -- If username does not appear in users, return 0
+  IF username NOT IN (SELECT username FROM users) THEN 
     RETURN 0;
   END IF;
 
   -- Generate hashed_password from password arg and compare to actual_password,
   -- if they are not the same then return 0 and return 1 otherwise as both user-
   -- name and password are good
-  SET salted_password = CONCAT((SELECT salt FROM user_info 
-    WHERE user_info.username=username), password);
+  SET salted_password = CONCAT((SELECT salt FROM users 
+    WHERE users.username=username), password);
   SET hashed_password = SHA2(salted_password, 256);
-  SET actual_password = (SELECT password_hash FROM user_info
-    WHERE user_info.username=username);
+  SET actual_password = (SELECT password_hash FROM users
+    WHERE users.username=username);
   IF hashed_password = actual_password THEN 
     RETURN 1;
   ELSE
@@ -109,15 +119,15 @@ BEGIN
   DECLARE new_salt CHAR(8);
   SET new_salt = make_salt(8);
 
-  UPDATE user_info 
+  UPDATE users 
   SET salt = new_salt, password_hash = SHA2(CONCAT(new_salt, new_password), 256)
-  WHERE user_info.username = username;
+  WHERE users.username = username;
 END !
 DELIMITER !
 
 DELIMITER ;
 
--- Add at least two users into your user_info table so that when we 
+-- Add at least two users into your users table so that when we 
 -- run this file, we will have examples users in the database.
 CALL sp_add_user('jlavin', 'jlavinpw');
 CALL sp_add_user('alinazhang', 'alinazhangpw');
