@@ -10,13 +10,13 @@ CREATE TABLE users (
     -- Unique identifier for each user
     user_ID INT AUTO_INCREMENT PRIMARY KEY,
     -- Username of user
-    username VARCHAR(250) NOT NULL,
+    username VARCHAR(250) NOT NULL UNIQUE,
     -- Email address of user
     email VARCHAR(250) NOT NULL UNIQUE,
     -- Flag to indicate whether the user has administrative priveleges
     is_admin BOOLEAN NOT NULL,
     -- The date and time the user joined
-    date_joined DATETIME NOT NULL
+    date_joined DATETIME
 );
 
 -- Table for storing compilation of beyblade parts

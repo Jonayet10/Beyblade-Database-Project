@@ -82,7 +82,6 @@ def add_battle(tournament_name, date, location, player1_id, player2_id, player1_
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
 # ----------------------------------------------------------------------
@@ -149,6 +148,22 @@ def login():
             else:
                 sys.stderr("Error logging in.")
 
+# Add user to 'user_info' and 'users' tables
+def add_user(username, email, password, is_admin):
+    cursor = conn.cursor()
+    sql_user_info = "CALL sp_add_user(%s, %s)"  # Call the stored procedure to add user to user_info table
+    sql_users = "INSERT INTO users (username, email, is_admin) VALUES (%s, %s, %s)"  # Add user to users table
+    try:
+        # Add user to user_info table
+        cursor.execute(sql_user_info, (username, password))
+        # Add user to users table
+        cursor.execute(sql_users, (username, email, is_admin))
+        conn.commit()
+        print(f"User '{username}' added successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
@@ -161,9 +176,9 @@ def show_options():
     print('What would you like to do? ')
     print('  (a) - Add a new Beyblade')
     print('  (b) - Add a new battle result')
+    print('  (c) - Add a new user')
     # Add more options as needed
     print('  (q) - quit')
-    print()
     ans = input('Enter an option: ').lower()
 
     if ans == 'q':
@@ -192,6 +207,13 @@ def show_options():
         winner_id = input('Enter Winner ID (leave blank if draw): ')
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
+    elif ans == 'c':
+        # Prompt for user details and call a function to add the user
+        username = input('Enter username: ')
+        email = input('Enter email: ')
+        password = input('Enter password: ')
+        is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
+        add_user(username, email, password, is_admin)
     elif ans == 'q':
         quit_ui()
 
