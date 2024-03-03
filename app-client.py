@@ -7,6 +7,17 @@ Clients (Beybladers) can view battle information and results in the 'battles'
 table and can view Beyblades in the 'beyblades' table. 
 
 """
+
+"""
+Things to implement: 
+- add what the arguments are to functions
+- state what it returns/does. Look at dll for what functions should 
+  return, like for view_parts, makes sense to return the type, weight, and
+  description. 
+- update options.
+"""
+
+
 import sys  # to print error messages to sys.stderr
 import mysql.connector
 # To get error codes from the connector, useful for user-friendly
@@ -59,27 +70,99 @@ def get_conn():
 
 def view_all_beyblades():
     """
+    Queries the beyblades table for 
+    the entirety of all beyblades for the user to look through. 
+
+    Return value: Query of the beyblades table.
     """
 
-def view_all_battle_results_for_user():
+def view_all_battle_results_for_user(user_name):
     """
+    Queries the battles table for all battle results related to the 
+    current user. 
+
+    Arguments:
+        user_name (str) - the name of the user. 
+
+    Return value: Query of the battles table. 
     """
 
-def view_battle_results_for_tournament():
+def view_battle_results_for_tournament(tournament_name):
     """
+    Queries the battles table for all battle results related to the 
+    specified tournament. 
+
+    Arguments:
+        tournament_name (str) - the name of the tournament.  
+
+    Return value: Query of the battles table. 
     """
 
-def view_battle_results_for_date():
+def view_battle_results_for_location(location):
     """
+    Queries the battles table for all battle results related to the 
+    specified location. 
+
+    Arguments:
+        location (str) - the specified location.
+
+    Return value: Query of the battles table.
     """
 
-def view_battle_results_for_location():
+def view_beyblade_info(name):
     """
+    Queries the beyblades table for the information of all beyblades with that
+    particular name.
+
+    Arguments:
+        name (str) - the specified beyblade name.
+
+    Return value: Query of the beyblades table. 
     """
 
-def get_beyblade_name_and_heav_weight_for_type():
+def view_part_info(part_name):
     """
+    Queries the parts table for the information of the specified part name.
+
+    Arguments:
+        part_name (str) - the specified part name.
+
+    Return value: Query of the parts table. 
     """
+
+def view_user_beyblades(user_name):
+    """
+    Queries the userbeyblades table for the beyblades of the specified user 
+    name.
+
+    Arguments:
+        user_name (str) - the specified user name.
+
+    Return value: Query of the userbeyblades table.  
+    """
+
+def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
+                 fusion_wheel_id, spin_track_id, performance_tip_id):
+    """
+    Adds the beyblade to the beyblades and userbeyblades table.
+
+    Arguments:
+        name (str) ... (so on.) TODO
+    
+    Return value: none.
+    """
+    cursor = conn.cursor()
+    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
+           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+    try:
+        cursor.execute(sql, data)
+        conn.commit()
+        print(f"Added new Beyblade: {name}")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+
 
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
@@ -100,8 +183,8 @@ def is_client(username):
     try:
         cursor.execute(sql, (username,))
         result = cursor.fetchone()
-        # If the user exists and the is_admin flag is True, return True
-        if result and result[0]:
+        # If the user exists and the is_admin flag is false, return True
+        if result and (not result[0]):
             return True
         else:
             return False
@@ -147,6 +230,32 @@ def login():
             else:
                 sys.stderr("Error logging in.")
 
+# Add user to 'user_info' and 'users' tables
+def add_user(username, email, password, is_client):
+    """
+    Adds the user to the users and user_info table.
+
+    Arguments:
+        username (str) - TODO
+        email (str) - TODO
+        password (str) - TODO
+        is_client (bool) - TODO
+    
+    Return value: none.
+    """
+    cursor = conn.cursor()
+    sql_user_info = "CALL sp_add_user(%s, %s)"  # Call the stored procedure to add user to user_info table
+    sql_users = "INSERT INTO users (username, email, is_admin) VALUES (%s, %s, %s)"  # Add user to users table
+    try:
+        # Add user to user_info table
+        cursor.execute(sql_user_info, (username, password))
+        # Add user to users table
+        cursor.execute(sql_users, (username, email, is_admin))
+        conn.commit()
+        print(f"User '{username}' added successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
@@ -157,13 +266,16 @@ def show_options():
     sending a request to do <x>, etc.
     """
     print('What would you like to do? ')
-    print('  (a) - View All Beyblades')
     # Add more options as needed
+    print('  (a) - View all Beyblades')
     print('  (b) - View your battle results')
     print('  (c) - View battle results for a tournament')
-    print('  (d) - View battle results for specific date')
-    print('  (e) - View battle results for location')
-    print('  (f) - Get the name and weight of the heaviest Beyblade for a Type')
+    print('  (d) - View battle results for location')
+    print('  (e) - View information about a Beyblade.')
+    print('  (f) - View information about a part.')
+    print('  (g) - View your Beyblades.')
+    print('  (h) - Add a Beyblade.')
+    print('  (i) - Add a user.')
     print('  (q) - quit')
     print()
     ans = input('Enter an option: ').lower()
@@ -172,28 +284,54 @@ def show_options():
         quit_ui()
     elif ans == 'a':
         print("VIEWING ALL BEYBLADES.")
-        view_all_beyblades()
+        # view_all_beyblades()
         show_options()
     elif ans == 'b':
         print("VIEWING ALL BATTLE RESULTS FOR USER.")
-        view_all_battle_results_for_user()
+        # view_all_battle_results_for_user()
         show_options()
     elif ans == 'c':
         print("VIEWING ALL BATTLE RESULTS FOR TOURNAMENT.")
-        view_battle_results_for_tournament()
+        # view_battle_results_for_tournament()
         show_options()
     elif ans == 'd':
-        print("VIEWING ALL BATTLE RESULTS FOR DATE.")
-        view_battle_results_for_date()
+        print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
+        # view_battle_results_for_location()
         show_options()
     elif ans == 'e':
-        print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
-        view_battle_results_for_location()
+        print("VIEWING INFORMATION ABOUT A BEYBLADE.")
+        # view_beyblade_info()
         show_options()
     elif ans == 'f':
-        print("RETRIEVING HEAVIEST BEYBLADE.")
-        get_beyblade_name_and_heav_weight_for_type()
+        print("VIEWING INFORMATION ABOUT A PART.")
+        # view_part_info()
         show_options()
+    elif ans == 'g':
+        print("VIEWING ALL USER BEYBLADES.")
+        # view_user_beyblades()
+        show_options()
+    elif ans == 'h':
+        # Prompt for Beyblade details and call add_beyblade function
+        # TODO: Fix style here, keep it under 80 chars per line. 
+        name = input('Enter Beyblade name: ')
+        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
+        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
+        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
+        face_bolt_id = input('Enter Face Bolt ID: ')
+        energy_ring_id = input('Enter Energy Ring ID: ')
+        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
+        spin_track_id = input('Enter Spin Track ID: ')
+        performance_tip_id = input('Enter Performance Tip ID: ')
+        add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options()
+    elif ans == 'i':
+        # Prompt for user details and call a function to add the user
+        # TODO: Fix style here, keep it under 80 chars per line. 
+        username = input('Enter username: ')
+        email = input('Enter email: ')
+        password = input('Enter password: ')
+        is_client = !(input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes'])
+        add_user(username, email, password, is_client)
     elif ans == 'q':
         quit_ui()
 
