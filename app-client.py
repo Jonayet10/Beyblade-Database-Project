@@ -8,16 +8,6 @@ table and can view Beyblades in the 'beyblades' table.
 
 """
 
-"""
-Things to implement: 
-- add what the arguments are to functions
-- state what it returns/does. Look at dll for what functions should 
-  return, like for view_parts, makes sense to return the type, weight, and
-  description. 
-- update options.
-"""
-
-
 import sys  # to print error messages to sys.stderr
 import mysql.connector
 # To get error codes from the connector, useful for user-friendly
