@@ -52,3 +52,21 @@ BEGIN
 END !
 
 DELIMITER ;
+
+
+-- This trigger automatically updated date_joined in 'users' table
+-- whenever a  new row is inserted into it. Notably, new rows are inserted
+-- into this table in add_user function of app.py files, and they do not
+-- require date_joined as this is automatically done with the trigger.
+DELIMITER !
+
+CREATE TRIGGER update_date_joined
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+    SET NEW.date_joined = NOW();
+END !
+
+DELIMITER ;
+
+

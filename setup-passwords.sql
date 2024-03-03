@@ -48,19 +48,21 @@ CREATE TABLE user_info (
     -- represented as 2 characters.  Thus, 256 / 8 * 2 = 64.
     -- We can use BINARY or CHAR here; BINARY simply has a different
     -- definition for comparison/sorting than CHAR.
-    password_hash BINARY(64) NOT NULL
+    password_hash BINARY(64) NOT NULL,
+
+    is_admin BOOLEAN NOT NULL
 );
 
 -- Adds a new user to the user_info table, using the specified password (max
 -- of 20 characters). Salts the password with a newly-generated salt value,
 -- and then the salt and hash values are both stored in the table.
 DELIMITER !
-CREATE PROCEDURE sp_add_user(new_username VARCHAR(20), password VARCHAR(20))
+CREATE PROCEDURE sp_add_user(new_username VARCHAR(20), password VARCHAR(20), is_admin BOOLEAN)
 BEGIN
   DECLARE salt CHAR(8);
   SET salt = make_salt(8);
   INSERT INTO user_info
-    VALUES (new_username, salt, SHA2(CONCAT(salt, password), 256));
+    VALUES (new_username, salt, SHA2(CONCAT(salt, password), 256), is_admin);
 END !
 DELIMITER ;
 
