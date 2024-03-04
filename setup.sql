@@ -15,7 +15,8 @@ CREATE TABLE users (
     email VARCHAR(250) NOT NULL UNIQUE,
     -- Flag to indicate whether the user has administrative priveleges
     is_admin BOOLEAN NOT NULL,
-    -- The date and time the user joined
+    -- The date and time the user joined,
+    -- allows NULL because it is set by a trigger
     date_joined DATETIME
 );
 

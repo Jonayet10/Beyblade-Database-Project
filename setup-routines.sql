@@ -7,11 +7,13 @@
 -- stock Beyblades in 'beyblades' table are already known VARCHAR types, but
 -- we want custom Beyblades in 'beyblades' table to have auto-generated IDs
 -- (they can be anything, just to  make sure they are unique). Therefore, 
--- we use UUID() function to generate an ID for each custom Beyblade.
+-- we use UUID() function to generate an ID for each custom Beyblade.If the
+-- Beyblade being inserted is stock, its just gonna take the beyblade_ID from
+-- the stock in 'beyblades' table.
 
 DELIMITER !
 
-CREATE PROCEDURE `sp_add_custom_beyblade`(
+CREATE PROCEDURE `sp_add_beyblade`(
     IN _user_id INT,
     IN _name VARCHAR(250),
     IN _type ENUM('Attack', 'Defense', 'Stamina', 'Balance'),
@@ -20,11 +22,11 @@ CREATE PROCEDURE `sp_add_custom_beyblade`(
     IN _energy_ring_id VARCHAR(20),
     IN _fusion_wheel_id VARCHAR(20),
     IN _spin_track_id VARCHAR(20),
-    IN _performance_tip_id VARCHAR(20)
+    IN _performance_tip_id VARCHAR(20),
 )
 BEGIN
     DECLARE _beyblade_id VARCHAR(10);
-    DECLARE _exists INT;
+    DECLARE _is_custom BOOLEAN;
 
     -- Check if the Beyblade already exists based on its parts
     SELECT beyblade_ID INTO _beyblade_id FROM beyblades
@@ -36,12 +38,16 @@ BEGIN
     LIMIT 1;
 
     IF _beyblade_id IS NULL THEN
+        SET _is_custom = TRUE;
         -- Generate a new beyblade_ID using MD5 and UUID, and take first 10 chars
         SET _beyblade_id = LEFT(MD5(UUID()), 10);
 
         -- Attempt to insert the new custom Beyblade with the generated ID
         INSERT INTO beyblades (beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID)
-        VALUES (_beyblade_id, _name, _type, TRUE, _series, _face_bolt_id, _energy_ring_id, _fusion_wheel_id, _spin_track_id, _performance_tip_id);
+        VALUES (_beyblade_id, _name, _type, _is_custom, _series, _face_bolt_id, _energy_ring_id, _fusion_wheel_id, _spin_track_id, _performance_tip_id);
+    ELSE
+        -- Match was found, so it's not a custom Beyblade
+        SET _is_custom = FALSE;
     END IF;
 
     -- Link the Beyblade (new or existing) to the user
