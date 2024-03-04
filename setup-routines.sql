@@ -11,7 +11,7 @@
 
 DELIMITER !
 
-CREATE PROCEDURE `sp_add_custom_beyblade`(
+CREATE PROCEDURE `sp_add_beyblade`(
     IN _user_id INT,
     IN _name VARCHAR(250),
     IN _type ENUM('Attack', 'Defense', 'Stamina', 'Balance'),
