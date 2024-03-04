@@ -1,29 +1,13 @@
 """
-TODO: Student name(s):
-TODO: Student email(s):
-TODO: High-level program overview
+Student name(s): Jonayet Lavin, Alina Zhang, Deepro Pasha
 
-******************************************************************************
-This is a template you may start with for your Final Project application.
-You may choose to modify it, or you may start with the example function
-stubs (most of which are incomplete).
+Student email(s): jlavin@caltech.edu, alinazhang@caltech.edu, dpasha@caltech.edu
 
-Some sections are provided as recommended program breakdowns, but are optional
-to keep, and you will probably want to extend them based on your application's
-features.
+Clients (Beybladers) can view battle information and results in the 'battles'
+table and can view Beyblades in the 'beyblades' table. 
 
-TODO:
-- Make a copy of app-template.py to a more appropriately named file. You can
-  either use app.py or separate a client vs. admin interface with app_client.py,
-  app_admin.py (you can factor out shared code in a third file, which is
-  recommended based on submissions in 22wi).
-- For full credit, remove any irrelevant comments, which are included in the
-  template to help you get started. Replace this program overview with a
-  brief overview of your application as well (including your name/partners name).
-  This includes replacing everything in this *** section!
-******************************************************************************
 """
-# TODO: Make sure you have these installed with pip3 if needed
+
 import sys  # to print error messages to sys.stderr
 import mysql.connector
 # To get error codes from the connector, useful for user-friendly
@@ -33,7 +17,6 @@ import mysql.connector.errorcode as errorcode
 # Debugging flag to print errors when debugging that shouldn't be visible
 # to an actual client. ***Set to False when done testing.***
 DEBUG = True
-
 
 # ----------------------------------------------------------------------
 # SQL Utility Functions
@@ -46,12 +29,12 @@ def get_conn():
     try:
         conn = mysql.connector.connect(
           host='localhost',
-          user='appadmin',
+          user='gokus',
           # Find port in MAMP or MySQL Workbench GUI or with
           # SHOW VARIABLES WHERE variable_name LIKE 'port';
           port='3306',  # this may change!
-          password='adminpw',
-          database='shelterdb' # replace this with your database name
+          password='gokuspw',
+          database='beybladedb' # replace this with your database name
         )
         print('Successfully connected.')
         return conn
@@ -61,11 +44,15 @@ def get_conn():
         # simulated program. Their user information would be in a users table
         # specific to your database; hence the DEBUG use.
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR and DEBUG:
-            sys.stderr('Incorrect username or password when connecting to DB.')
+            sys.stderr.write('Incorrect username or password when connecting to DB.' + '\n')
+            sys.stderr.flush()
         elif err.errno == errorcode.ER_BAD_DB_ERROR and DEBUG:
-            sys.stderr('Database does not exist.')
+            sys.stderr.write('Database does not exist.' + '\n')
+            sys.stderr.flush()
         elif DEBUG:
-            sys.stderr(err)
+            sys.stderr.write(str(err) + '\n')
+            sys.stderr.flush()
+
         else:
             # A fine catchall client-facing message.
             sys.stderr('An error occurred, please contact the administrator.')
@@ -74,27 +61,100 @@ def get_conn():
 # ----------------------------------------------------------------------
 # Functions for Command-Line Options/Query Execution
 # ----------------------------------------------------------------------
-def example_query():
-    param1 = ''
+
+def view_all_beyblades():
+    """
+    Queries the beyblades table for 
+    the entirety of all beyblades for the user to look through. 
+
+    Return value: Query of the beyblades table.
+    """
+
+def view_all_battle_results_for_user(user_name):
+    """
+    Queries the battles table for all battle results related to the 
+    current user. 
+
+    Arguments:
+        user_name (str) - the name of the user. 
+
+    Return value: Query of the battles table. 
+    """
+
+def view_battle_results_for_tournament(tournament_name):
+    """
+    Queries the battles table for all battle results related to the 
+    specified tournament. 
+
+    Arguments:
+        tournament_name (str) - the name of the tournament.  
+
+    Return value: Query of the battles table. 
+    """
+
+def view_battle_results_for_location(location):
+    """
+    Queries the battles table for all battle results related to the 
+    specified location. 
+
+    Arguments:
+        location (str) - the specified location.
+
+    Return value: Query of the battles table.
+    """
+
+def view_beyblade_info(name):
+    """
+    Queries the beyblades table for the information of all beyblades with that
+    particular name.
+
+    Arguments:
+        name (str) - the specified beyblade name.
+
+    Return value: Query of the beyblades table. 
+    """
+
+def view_part_info(part_name):
+    """
+    Queries the parts table for the information of the specified part name.
+
+    Arguments:
+        part_name (str) - the specified part name.
+
+    Return value: Query of the parts table. 
+    """
+
+def view_user_beyblades(user_name):
+    """
+    Queries the userbeyblades table for the beyblades of the specified user 
+    name.
+
+    Arguments:
+        user_name (str) - the specified user name.
+
+    Return value: Query of the userbeyblades table.  
+    """
+
+def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
+                 fusion_wheel_id, spin_track_id, performance_tip_id):
+    """
+    Adds the beyblade to the beyblades and userbeyblades table.
+
+    Arguments:
+        name (str) ... (so on.) TODO
+    
+    Return value: none.
+    """
     cursor = conn.cursor()
-    # Remember to pass arguments as a tuple like so to prevent SQL
-    # injection.
-    sql = 'SELECT col1 FROM table WHERE col2 = \'%s\';' % (param1, )
+    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
+           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
     try:
-        cursor.execute(sql)
-        # row = cursor.fetchone()
-        rows = cursor.fetchall()
-        for row in rows:
-            (col1val) = (row) # tuple unpacking!
-            # do stuff with row data
+        cursor.execute(sql, data)
+        conn.commit()
+        print(f"Added new Beyblade: {name}")
     except mysql.connector.Error as err:
-        # If you're testing, it's helpful to see more details printed.
-        if DEBUG:
-            sys.stderr(err)
-            sys.exit(1)
-        else:
-            # TODO: Please actually replace this :) 
-            sys.stderr('An error occurred, give something useful for clients...')
+        print(f"Error: {err}")
 
 
 
@@ -107,11 +167,92 @@ def example_query():
 # app-client.py vs. app-admin.py (in which case you don't need to
 # support any prompt functionality to conditionally login to the sql database)
 
+def is_client(username):
+    """
+    Helper function to verify whether the user logging in is a BeyClient.
+    Checks the `is_client` flag for the given username in the `users` table.
+    """
+    cursor = conn.cursor()
+    sql = "SELECT is_client FROM users WHERE username = %s;"
+    try:
+        cursor.execute(sql, (username,))
+        result = cursor.fetchone()
+        # If the user exists and the is_admin flag is false, return True
+        if result and (not result[0]):
+            return True
+        else:
+            return False
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        return False
+    finally:
+        cursor.close()
+
+def login():
+    """
+    This function prompts the login for an admin.
+    It checks the database to ensure that the username and password are correct.
+    """
+    cursor = conn.cursor()
+
+    print("\n------------------------------ BeyClient Login ------------------------------\n")
+
+    while True:
+        username = input("USERNAME: ").lower()
+        password = input("PASSWORD: ").lower()
+
+        while not is_client(username):
+            print("\nIt appears that you are not a BeyClient. Please try again! \n")
+            username = input("USERNAME: ").lower()
+            password = input("PASSWORD: ").lower()
+
+        sql = "SELECT authenticate('%s', '%s');" % (username, password)
+
+        try:
+            cursor.execute(sql)
+            check_response = cursor.fetchone()
+
+            if check_response[0] == 1:
+                show_options()
+            else:
+                print("\nUsername or password is incorrect. Please try again :)\n")
+
+        except mysql.connector.Error as err:
+            if DEBUG:
+                sys.stderr(err)
+                sys.exit(1)
+            else:
+                sys.stderr("Error logging in.")
+
+# Add user to 'user_info' and 'users' tables
+def add_user(username, email, password, is_client):
+    """
+    Adds the user to the users and user_info table.
+
+    Arguments:
+        username (str) - TODO
+        email (str) - TODO
+        password (str) - TODO
+        is_client (bool) - TODO
+    
+    Return value: none.
+    """
+    cursor = conn.cursor()
+    sql_user_info = "CALL sp_add_user(%s, %s)"  # Call the stored procedure to add user to user_info table
+    sql_users = "INSERT INTO users (username, email, is_admin) VALUES (%s, %s, %s)"  # Add user to users table
+    try:
+        # Add user to user_info table
+        cursor.execute(sql_user_info, (username, password))
+        # Add user to users table
+        cursor.execute(sql_users, (username, email, is_admin))
+        conn.commit()
+        print(f"User '{username}' added successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
 
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
-# TODO: Please change these!
 def show_options():
     """
     Displays options users can choose in the application, such as
@@ -119,48 +260,84 @@ def show_options():
     sending a request to do <x>, etc.
     """
     print('What would you like to do? ')
-    print('  (TODO: provide command-line options)')
-    print('  (x) - something nifty to do')
-    print('  (x) - another nifty thing')
-    print('  (x) - yet another nifty thing')
-    print('  (x) - more nifty things!')
+    # Add more options as needed
+    print('  (a) - View all Beyblades')
+    print('  (b) - View your battle results')
+    print('  (c) - View battle results for a tournament')
+    print('  (d) - View battle results for location')
+    print('  (e) - View information about a Beyblade.')
+    print('  (f) - View information about a part.')
+    print('  (g) - View your Beyblades.')
+    print('  (h) - Add a Beyblade.')
+    print('  (i) - Add a user.')
     print('  (q) - quit')
     print()
     ans = input('Enter an option: ').lower()
+
     if ans == 'q':
         quit_ui()
-    elif ans == '':
-        pass
+    elif ans == 'a':
+        print("VIEWING ALL BEYBLADES.")
+        # view_all_beyblades()
+        show_options()
+    elif ans == 'b':
+        print("VIEWING ALL BATTLE RESULTS FOR USER.")
+        # view_all_battle_results_for_user()
+        show_options()
+    elif ans == 'c':
+        print("VIEWING ALL BATTLE RESULTS FOR TOURNAMENT.")
+        # view_battle_results_for_tournament()
+        show_options()
+    elif ans == 'd':
+        print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
+        # view_battle_results_for_location()
+        show_options()
+    elif ans == 'e':
+        print("VIEWING INFORMATION ABOUT A BEYBLADE.")
+        # view_beyblade_info()
+        show_options()
+    elif ans == 'f':
+        print("VIEWING INFORMATION ABOUT A PART.")
+        # view_part_info()
+        show_options()
+    elif ans == 'g':
+        print("VIEWING ALL USER BEYBLADES.")
+        # view_user_beyblades()
+        show_options()
+    elif ans == 'h':
+        # Prompt for Beyblade details and call add_beyblade function
+        # TODO: Fix style here, keep it under 80 chars per line. 
+        name = input('Enter Beyblade name: ')
+        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
+        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
+        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
+        face_bolt_id = input('Enter Face Bolt ID: ')
+        energy_ring_id = input('Enter Energy Ring ID: ')
+        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
+        spin_track_id = input('Enter Spin Track ID: ')
+        performance_tip_id = input('Enter Performance Tip ID: ')
+        add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options()
+    elif ans == 'i':
+        # Prompt for user details and call a function to add the user
+        # TODO: Fix style here, keep it under 80 chars per line. 
+        username = input('Enter username: ')
+        email = input('Enter email: ')
+        password = input('Enter password: ')
+        user_input = input('Is the user an admin? (True/False): ').lower()
+        is_client = user_input not in ['true', '1', 't', 'y', 'yes']
 
-
-# Another example of where we allow you to choose to support admin vs. 
-# client features  in the same program, or
-# separate the two as different app_client.py and app_admin.py programs 
-# using the same database.
-def show_admin_options():
-    """
-    Displays options specific for admins, such as adding new data <x>,
-    modifying <x> based on a given id, removing <x>, etc.
-    """
-    print('What would you like to do? ')
-    print('  (x) - something nifty for admins to do')
-    print('  (x) - another nifty thing')
-    print('  (x) - yet another nifty thing')
-    print('  (x) - more nifty things!')
-    print('  (q) - quit')
-    print()
-    ans = input('Enter an option: ').lower()
-    if ans == 'q':
+        add_user(username, email, password, is_client)
+    elif ans == 'q':
         quit_ui()
-    elif ans == '':
-        pass
-
 
 def quit_ui():
     """
     Quits the program, printing a good bye message to the user.
     """
-    print('Good bye!')
+    print('\n----------------------------------------------------------------\n')
+    print('Thank you for keeping the Beyblade legacy ablaze. May the Beyblade spirit be with you. Goodbye!')
+    print('\n----------------------------------------------------------------\n')
     exit()
 
 
@@ -168,7 +345,7 @@ def main():
     """
     Main function for starting things up.
     """
-    show_options()
+    login()
 
 
 if __name__ == '__main__':

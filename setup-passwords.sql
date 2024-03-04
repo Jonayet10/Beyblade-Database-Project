@@ -121,9 +121,9 @@ DELIMITER ;
 
 -- Add at least two users into your user_info table so that when we 
 -- run this file, we will have examples users in the database.
-CALL sp_add_user('jlavin', 'jlavinpw');
-CALL sp_add_user('alinazhang', 'alinazhangpw');
-CALL sp_add_user('dpasha', 'dpashapw');
+CALL sp_add_user('jlavin', 'jlavinpw', 1);
+CALL sp_add_user('alinazhang', 'alinazhangpw', 1);
+CALL sp_add_user('dpasha', 'dpashapw', 1);
 
-CALL sp_add_user('gokus', 'gokuspw');
-CALL sp_add_user('midoriyai', 'midoriyaipw');
+CALL sp_add_user('gokus', 'gokuspw', 0);
+CALL sp_add_user('midoriyai', 'midoriyaipw', 0);

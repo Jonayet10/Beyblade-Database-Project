@@ -44,11 +44,15 @@ def get_conn():
         # simulated program. Their user information would be in a users table
         # specific to your database; hence the DEBUG use.
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR and DEBUG:
-            sys.stderr('Incorrect username or password when connecting to DB.')
+            sys.stderr.write('Incorrect username or password when connecting to DB.' + '\n')
+            sys.stderr.flush()
         elif err.errno == errorcode.ER_BAD_DB_ERROR and DEBUG:
-            sys.stderr('Database does not exist.')
+            sys.stderr.write('Database does not exist.' + '\n')
+            sys.stderr.flush()
         elif DEBUG:
-            sys.stderr(err)
+            sys.stderr.write(str(err) + '\n')
+            sys.stderr.flush()
+
         else:
             # A fine catchall client-facing message.
             sys.stderr('An error occurred, please contact the administrator.')
