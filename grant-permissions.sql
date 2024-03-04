@@ -25,8 +25,10 @@ GRANT ALL PRIVILEGES ON beybladedb.* TO 'dpasha'@'localhost';
 -- Grant SELECT permission on beyblades and parts tables to Bladers
 GRANT SELECT ON beybladedb.beyblades TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.parts TO 'gokus'@'localhost';
+GRANT SELECT ON beybladedb.userbeyblades TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.beyblades TO 'midoriyai'@'localhost';
 GRANT SELECT ON beybladedb.parts TO 'midoriyai'@'localhost';
+GRANT SELECT ON beybladedb.userbeyblades TO 'midoriyai'@'localhost';
 
 -- Grand SELECT permission on users to all clients
 GRANT SELECT ON beybladedb.users TO 'gokus'@'localhost';
@@ -44,5 +46,8 @@ GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'gokus'@'localhost';
 GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'midoriyai'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'gokus'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'midoriyai'@'localhost';
+
+GRANT SELECT ON beybladedb.battles TO 'gokus'@'localhost';
+GRANT SELECT ON beybladedb.battles TO 'midoriyai'@'localhost';
 
 FLUSH PRIVILEGES;
