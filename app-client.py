@@ -69,6 +69,18 @@ def view_all_beyblades():
 
     Return value: Query of the beyblades table.
     """
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM beyblades;")
+
+    # Fetching all results
+    results = cursor.fetchall()
+
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
+
+    return results
 
 def view_all_battle_results_for_user(user_name):
     """
@@ -135,7 +147,7 @@ def view_user_beyblades(user_name):
     Return value: Query of the userbeyblades table.  
     """
 
-def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
+def add_beyblade(name, type, series, face_bolt_id, energy_ring_id, 
                  fusion_wheel_id, spin_track_id, performance_tip_id):
     """
     Adds the beyblade to the beyblades and userbeyblades table.
@@ -146,8 +158,7 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
     Return value: none.
     """
     cursor = conn.cursor()
-    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
-           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    sql = ("CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s)")
     data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
     try:
         cursor.execute(sql, data)
@@ -170,18 +181,18 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
 def is_client(username):
     """
     Helper function to verify whether the user logging in is a BeyClient.
-    Checks the `is_client` flag for the given username in the `users` table.
+    Checks the `is_admin` flag for the given username in the `users` table.
     """
     cursor = conn.cursor()
-    sql = "SELECT is_client FROM users WHERE username = %s;"
+    sql = "SELECT is_admin FROM users WHERE username = %s;"
     try:
         cursor.execute(sql, (username,))
         result = cursor.fetchone()
         # If the user exists and the is_admin flag is false, return True
         if result and (not result[0]):
-            return True
-        else:
             return False
+        else:
+            return True
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return False
@@ -278,7 +289,7 @@ def show_options():
         quit_ui()
     elif ans == 'a':
         print("VIEWING ALL BEYBLADES.")
-        # view_all_beyblades()
+        print(view_all_beyblades())
         show_options()
     elif ans == 'b':
         print("VIEWING ALL BATTLE RESULTS FOR USER.")
@@ -336,7 +347,7 @@ def quit_ui():
     Quits the program, printing a good bye message to the user.
     """
     print('\n----------------------------------------------------------------\n')
-    print('Thank you for being a valuable member of the Beyblade community. Goodbye!')
+    print('Thank you for keeping the Beyblade legacy ablaze. May the Beyblade spirit be with you. Goodbye!')
     print('\n----------------------------------------------------------------\n')
     exit()
 

@@ -300,6 +300,7 @@ def show_options():
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
         add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options()
     elif ans == 'b':
         # Prompt for battle details and call a function to add battle result
         tournament_name = input('Enter tournament name: ')
@@ -312,6 +313,7 @@ def show_options():
         winner_id = input('Enter Winner ID (leave blank if draw): ')
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
+        show_options()
     elif ans == 'c':
         # Prompt for user details and call a function to add the user
         username = input('Enter username: ')
@@ -319,20 +321,21 @@ def show_options():
         password = input('Enter password: ')
         is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         add_user(username, email, password, is_admin)
+        show_options()
     elif ans == 'd':
-        pass
+        show_options()
     elif ans == 'e':
-        pass
+        show_options()
     elif ans == 'f':
-        pass
+        show_options()
     elif ans == 'g':
-        pass
+        show_options()
     elif ans == 'h':
-        pass
+        show_options()
     elif ans == 'i':
-        pass
+        show_options()
     elif ans == 'j':
-        pass
+        show_options()
     elif ans == 'q':
         quit_ui() 
 
