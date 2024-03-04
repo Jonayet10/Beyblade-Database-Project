@@ -127,3 +127,4 @@ CALL sp_add_user('dpasha', 'dpashapw', 1);
 
 CALL sp_add_user('gokus', 'gokuspw', 0);
 CALL sp_add_user('midoriyai', 'midoriyaipw', 0);
+
