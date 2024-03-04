@@ -203,7 +203,6 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
         print(f"Error: {err}")
 
 
-
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
 # ----------------------------------------------------------------------
@@ -290,7 +289,9 @@ def add_user(username, email, password, is_client):
         # Add user to user_info table
         cursor.execute(sql_user_info, (username, password))
         # Add user to users table
+
         cursor.execute(sql_users, (username, email, is_client))
+        
         conn.commit()
         print(f"User '{username}' added successfully.")
     except mysql.connector.Error as err:
