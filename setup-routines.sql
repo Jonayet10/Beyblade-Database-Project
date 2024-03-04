@@ -20,7 +20,8 @@ CREATE PROCEDURE `sp_add_beyblade`(
     IN _energy_ring_id VARCHAR(20),
     IN _fusion_wheel_id VARCHAR(20),
     IN _spin_track_id VARCHAR(20),
-    IN _performance_tip_id VARCHAR(20)
+    IN _performance_tip_id VARCHAR(20),
+    IN _is_custom BOOLEAN
 )
 BEGIN
     DECLARE _beyblade_id VARCHAR(10);
@@ -41,7 +42,7 @@ BEGIN
 
         -- Attempt to insert the new custom Beyblade with the generated ID
         INSERT INTO beyblades (beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID)
-        VALUES (_beyblade_id, _name, _type, TRUE, _series, _face_bolt_id, _energy_ring_id, _fusion_wheel_id, _spin_track_id, _performance_tip_id);
+        VALUES (_beyblade_id, _name, _type, _is_custom, _series, _face_bolt_id, _energy_ring_id, _fusion_wheel_id, _spin_track_id, _performance_tip_id);
     END IF;
 
     -- Link the Beyblade (new or existing) to the user
