@@ -72,15 +72,112 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fu
 
 def add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id):
     cursor = conn.cursor()
-    sql = ("INSERT INTO battles (tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id) "
-           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
-    data = (tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
     try:
-        cursor.execute(sql, data)
+        cursor.callproc('sp_record_battle', (tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id))
         conn.commit()
         print("New battle result added successfully.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
+    finally:
+        cursor.close()
+        
+def view_users():
+    """
+    Retrieves and displays a list of all users and their information.
+    """
+    cursor = conn.cursor()
+    sql = "SELECT user_ID, username, email, is_admin, date_joined FROM users;"
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        if results:
+            print("\nCurrent Users:")
+            print(f"{'ID':<5} {'Username':<20} {'Email':<30} {'Admin':<10} {'Date Joined'}")
+            for row in results:
+                user_id, username, email, is_admin, date_joined = row
+                admin_status = "Yes" if is_admin else "No"
+                print(f"{user_id:<5} {username:<20} {email:<30} {admin_status:<10} {date_joined}")
+        else:
+            print("No users found.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+
+# Functions that also the client has
+def view_all_beyblades():
+    """
+    Queries the beyblades table for 
+    the entirety of all beyblades for the user to look through. 
+
+    Return value: Query of the beyblades table.
+    """
+
+def view_all_battle_results_for_user(user_name):
+    """
+    Queries the battles table for all battle results related to the 
+    current user. 
+
+    Arguments:
+        user_name (str) - the name of the user. 
+
+    Return value: Query of the battles table. 
+    """
+
+def view_battle_results_for_tournament(tournament_name):
+    """
+    Queries the battles table for all battle results related to the 
+    specified tournament. 
+
+    Arguments:
+        tournament_name (str) - the name of the tournament.  
+
+    Return value: Query of the battles table. 
+    """
+
+def view_battle_results_for_location(location):
+    """
+    Queries the battles table for all battle results related to the 
+    specified location. 
+
+    Arguments:
+        location (str) - the specified location.
+
+    Return value: Query of the battles table.
+    """
+
+def view_beyblade_info(name):
+    """
+    Queries the beyblades table for the information of all beyblades with that
+    particular name.
+
+    Arguments:
+        name (str) - the specified beyblade name.
+
+    Return value: Query of the beyblades table. 
+    """
+
+def view_part_info(part_name):
+    """
+    Queries the parts table for the information of the specified part name.
+
+    Arguments:
+        part_name (str) - the specified part name.
+
+    Return value: Query of the parts table. 
+    """
+
+def view_user_beyblades(user_name):
+    """
+    Queries the userbeyblades table for the beyblades of the specified user 
+    name.
+
+    Arguments:
+        user_name (str) - the specified user name.
+
+    Return value: Query of the userbeyblades table.  
+    """
+
 
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
@@ -177,6 +274,14 @@ def show_options():
     print('  (a) - Add a new Beyblade')
     print('  (b) - Add a new battle result')
     print('  (c) - Add a new user')
+    print('  (d) - View current users')
+
+    print('  (e) - View all Beyblades')
+    print('  (f) - View a user\'s battle results')
+    print('  (g) - View battle results for a tournament')
+    print('  (h) - View battle results for location')
+    print('  (i) - View information about a Beyblade.')
+    print('  (j) - View information about a part.')
     # Add more options as needed
     print('  (q) - quit')
     ans = input('Enter an option: ').lower()
@@ -214,8 +319,22 @@ def show_options():
         password = input('Enter password: ')
         is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         add_user(username, email, password, is_admin)
+    elif ans == 'd':
+        pass
+    elif ans == 'e':
+        pass
+    elif ans == 'f':
+        pass
+    elif ans == 'g':
+        pass
+    elif ans == 'h':
+        pass
+    elif ans == 'i':
+        pass
+    elif ans == 'j':
+        pass
     elif ans == 'q':
-        quit_ui()
+        quit_ui() 
 
 def quit_ui():
     """
