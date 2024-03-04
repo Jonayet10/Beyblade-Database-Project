@@ -131,7 +131,7 @@ def view_user_beyblades(user_name):
     Return value: Query of the userbeyblades table.  
     """
 
-def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
+def add_beyblade(name, type, series, face_bolt_id, energy_ring_id, 
                  fusion_wheel_id, spin_track_id, performance_tip_id):
     """
     Adds the beyblade to the beyblades and userbeyblades table.
@@ -142,8 +142,7 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
     Return value: none.
     """
     cursor = conn.cursor()
-    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
-           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    sql = ("CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s)")
     data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
     try:
         cursor.execute(sql, data)
