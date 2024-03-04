@@ -170,18 +170,18 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
 def is_client(username):
     """
     Helper function to verify whether the user logging in is a BeyClient.
-    Checks the `is_client` flag for the given username in the `users` table.
+    Checks the `is_admin` flag for the given username in the `users` table.
     """
     cursor = conn.cursor()
-    sql = "SELECT is_client FROM users WHERE username = %s;"
+    sql = "SELECT is_admin FROM users WHERE username = %s;"
     try:
         cursor.execute(sql, (username,))
         result = cursor.fetchone()
         # If the user exists and the is_admin flag is false, return True
         if result and (not result[0]):
-            return True
-        else:
             return False
+        else:
+            return True
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return False
