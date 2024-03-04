@@ -14,6 +14,8 @@ import mysql.connector
 # error-handling
 import mysql.connector.errorcode as errorcode
 
+from tabulate import tabulate
+
 # Debugging flag to print errors when debugging that shouldn't be visible
 # to an actual client. ***Set to False when done testing.***
 DEBUG = True
@@ -44,7 +46,8 @@ def get_conn():
         # simulated program. Their user information would be in a users table
         # specific to your database; hence the DEBUG use.
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR and DEBUG:
-            sys.stderr.write('Incorrect username or password when connecting to DB.' + '\n')
+            sys.stderr.write('Incorrect username or password' 
+                             'when connecting to DB.' + '\n')
             sys.stderr.flush()
         elif err.errno == errorcode.ER_BAD_DB_ERROR and DEBUG:
             sys.stderr.write('Database does not exist.' + '\n')
@@ -76,11 +79,18 @@ def view_all_beyblades():
     # Fetching all results
     results = cursor.fetchall()
 
+    # Defining the table headers as per beyblades table columns
+    headers = ['Beyblade ID', 'Name', 'Type', 'Is Custom', 'Series', 
+               'Face Bolt ID', 'Energy Ring ID', 'Fusion Wheel ID', 
+               'Spin Track ID', 'Performance Tip ID']
+
+    # Printing the results in a table format
+    print(tabulate(results, headers=headers, tablefmt="grid"))
+
     # Closing cursor and connection
     cursor.close()
     conn.close()
 
-    return results
 
 def view_all_battle_results_for_user(user_name):
     """
@@ -92,6 +102,29 @@ def view_all_battle_results_for_user(user_name):
 
     Return value: Query of the battles table. 
     """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    # SQL query to fetch battle results for the given user
+    query = """
+    SELECT b.battle_ID, b.tournament_name, b.date, b.location, b.player1_ID, 
+    b.player2_ID, b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
+    FROM battles b
+    JOIN users u1 ON b.player1_ID = u1.user_ID
+    JOIN users u2 ON b.player2_ID = u2.user_ID
+    WHERE u1.username = %s OR u2.username = %s;
+    """
+    cursor.execute(query, (user_name, user_name))
+
+    # Fetching all results
+    results = cursor.fetchall()
+
+    headers = ["Battle ID", "Tournament Name", "Date", "Location", 
+               "Player 1 ID", "Player 2 ID", "Player 1 Beyblade ID", 
+               "Player 2 BeyBlade ID", "Winner ID"]
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
 
 def view_battle_results_for_tournament(tournament_name):
     """
@@ -291,7 +324,7 @@ def show_options():
         quit_ui()
     elif ans == 'a':
         print("VIEWING ALL BEYBLADES.")
-        print(view_all_beyblades())
+        view_all_beyblades()
         show_options()
     elif ans == 'b':
         print("VIEWING ALL BATTLE RESULTS FOR USER.")
