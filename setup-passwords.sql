@@ -5,7 +5,7 @@ DROP FUNCTION IF EXISTS make_salt;
 DROP FUNCTION IF EXISTS authenticate;
 
 DROP PROCEDURE IF EXISTS sp_add_user;
-DROP PROCEDURE IF EXITS sp_change_password;
+DROP PROCEDURE IF EXISTS sp_change_password;
 
 -- (Provided) This function generates a specified number of characters 
 -- for using as a salt in passwords.
