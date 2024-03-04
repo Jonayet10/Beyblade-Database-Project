@@ -69,6 +69,18 @@ def view_all_beyblades():
 
     Return value: Query of the beyblades table.
     """
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM beyblades;")
+
+    # Fetching all results
+    results = cursor.fetchall()
+
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
+
+    return results
 
 def view_all_battle_results_for_user(user_name):
     """
@@ -278,7 +290,7 @@ def show_options():
         quit_ui()
     elif ans == 'a':
         print("VIEWING ALL BEYBLADES.")
-        # view_all_beyblades()
+        print(view_all_beyblades())
         show_options()
     elif ans == 'b':
         print("VIEWING ALL BATTLE RESULTS FOR USER.")
