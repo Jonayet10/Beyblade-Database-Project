@@ -42,8 +42,8 @@ GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'midoriyai'@'localho
 -- This allows Bladers to perform actions encapsulated by the procedure, even
 -- if they don't have direct permissions to perform those actions on the
 -- underlying tables ('beyblades' table)
-GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'gokus'@'localhost';
-GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'midoriyai'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_custom_beyblade TO 'gokus'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_custom_beyblade TO 'midoriyai'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'gokus'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'midoriyai'@'localhost';
 
