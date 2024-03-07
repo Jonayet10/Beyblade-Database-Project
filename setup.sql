@@ -43,7 +43,7 @@ CREATE TABLE beyblades (
     -- Flag to indicate whether the Beyblade is custom-made
     is_custom BOOLEAN NOT NULL,
     -- Series the Beyblade is from
-    series ENUM('Metal Fusion', 'Metal Masters', 'Metal Fury') NOT NULL,
+    series ENUM('Metal Fusion', 'Metal Masters', 'Metal Fury'),
     -- Foreign keys linking to the parts table
     face_bolt_ID VARCHAR(20),
     energy_ring_ID VARCHAR(20),

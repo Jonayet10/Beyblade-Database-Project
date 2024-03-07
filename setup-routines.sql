@@ -26,7 +26,7 @@ CREATE PROCEDURE `sp_add_beyblade`(
 )
 BEGIN
     DECLARE _beyblade_id VARCHAR(10);
-    DECLARE _is_custom BOOLEAN;
+    DECLARE _is_custom BOOLEAN; -- if the beyblade is not in the database, it is custom
 
     -- Check if the Beyblade already exists based on its parts
     SELECT beyblade_ID INTO _beyblade_id FROM beyblades
@@ -105,6 +105,36 @@ BEFORE INSERT ON users
 FOR EACH ROW
 BEGIN
     SET NEW.date_joined = NOW();
+END !
+
+DELIMITER ;
+
+
+-- Defines a function to find the heaviest beyblade of a specified type.
+-- It calculates the total weight of each beyblade by summing the weights of its constituent parts.
+-- The function accepts an input parameter of beyblade type (Attack, Defense, Stamina, Balance)
+-- and returns the beyblade_id of the heaviest beyblade within the specified type.
+DELIMITER !
+
+CREATE FUNCTION udf_heaviest_beyblade_for_type(beyblade_type ENUM('Attack', 'Defense', 'Stamina', 'Balance'))
+RETURNS VARCHAR(10)
+DETERMINISTIC
+BEGIN
+    DECLARE heaviest_beyblade_id VARCHAR(10);
+
+    SELECT b.beyblade_id INTO heaviest_beyblade_id
+    FROM beyblades AS b
+    JOIN parts AS fb ON b.face_bolt_id = fb.part_id
+    JOIN parts AS er ON b.energy_ring_id = er.part_id
+    JOIN parts AS fw ON b.fusion_wheel_id = fw.part_id
+    JOIN parts AS st ON b.spin_track_id = st.part_id
+    JOIN parts AS pt ON b.performance_tip_id = pt.part_id
+    WHERE b.type = beyblade_type
+    GROUP BY b.beyblade_id
+    ORDER BY SUM(fb.weight + er.weight + fw.weight + st.weight + pt.weight) DESC
+    LIMIT 1;
+
+    RETURN heaviest_beyblade_id;
 END !
 
 DELIMITER ;

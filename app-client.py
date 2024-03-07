@@ -14,6 +14,8 @@ import mysql.connector
 # error-handling
 import mysql.connector.errorcode as errorcode
 
+from tabulate import tabulate
+
 # Debugging flag to print errors when debugging that shouldn't be visible
 # to an actual client. ***Set to False when done testing.***
 DEBUG = True
@@ -44,7 +46,8 @@ def get_conn():
         # simulated program. Their user information would be in a users table
         # specific to your database; hence the DEBUG use.
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR and DEBUG:
-            sys.stderr.write('Incorrect username or password when connecting to DB.' + '\n')
+            sys.stderr.write('Incorrect username or password' 
+                             'when connecting to DB.' + '\n')
             sys.stderr.flush()
         elif err.errno == errorcode.ER_BAD_DB_ERROR and DEBUG:
             sys.stderr.write('Database does not exist.' + '\n')
@@ -76,11 +79,17 @@ def view_all_beyblades():
     # Fetching all results
     results = cursor.fetchall()
 
+    # Defining the table headers as per beyblades table columns
+    headers = ['Beyblade ID', 'Name', 'Type', 'Is Custom', 'Series', 
+               'Face Bolt ID', 'Energy Ring ID', 'Fusion Wheel ID', 
+               'Spin Track ID', 'Performance Tip ID']
+
+    # Printing the results in a table format
+    print(tabulate(results, headers=headers, tablefmt="grid"))
+
     # Closing cursor and connection
     cursor.close()
     conn.close()
-
-    return results
 
 def view_all_battle_results_for_user(user_name):
     """
@@ -92,6 +101,37 @@ def view_all_battle_results_for_user(user_name):
 
     Return value: Query of the battles table. 
     """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    # SQL query to fetch battle results for the given user
+    query = """
+    SELECT b.battle_ID, b.tournament_name, b.date, b.location, 
+           u1.username AS Player1_Username, u2.username AS Player2_Username, 
+           bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
+           b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
+    FROM battles b
+    JOIN users u1 ON b.player1_ID = u1.user_ID
+    JOIN users u2 ON b.player2_ID = u2.user_ID
+    JOIN userbeyblades ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
+    JOIN userbeyblades ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
+    WHERE u1.username = %s OR u2.username = %s;
+    """
+    cursor.execute(query, (user_name, user_name))
+
+    # Fetching all results
+    results = cursor.fetchall()
+    headers = ["Battle ID", "Tournament Name", "Date", "Location", 
+               "Player 1 Username", "Player 2 Username", 
+               "Player 1 Beyblade Name", "Player 2 Beyblade Name", 
+               "Player 1 Beyblade ID", "Player 2 BeyBlade ID", "Winner ID"]
+    
+    print(tabulate(results, headers=headers, tablefmt="grid"))
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
 
 def view_battle_results_for_tournament(tournament_name):
     """
@@ -147,7 +187,7 @@ def view_user_beyblades(user_name):
     Return value: Query of the userbeyblades table.  
     """
 
-def add_beyblade(name, type, series, face_bolt_id, energy_ring_id, 
+def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
                  fusion_wheel_id, spin_track_id, performance_tip_id):
     """
     Adds the beyblade to the beyblades and userbeyblades table.
@@ -157,8 +197,10 @@ def add_beyblade(name, type, series, face_bolt_id, energy_ring_id,
     
     Return value: none.
     """
+    conn = get_conn()
     cursor = conn.cursor()
-    sql = ("CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s)")
+    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
+           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
     data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
     try:
         cursor.execute(sql, data)
@@ -166,7 +208,6 @@ def add_beyblade(name, type, series, face_bolt_id, energy_ring_id,
         print(f"Added new Beyblade: {name}")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
-
 
 
 # ----------------------------------------------------------------------
@@ -190,9 +231,9 @@ def is_client(username):
         result = cursor.fetchone()
         # If the user exists and the is_admin flag is false, return True
         if result and (not result[0]):
-            return False
-        else:
             return True
+        else:
+            return False
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return False
@@ -224,7 +265,7 @@ def login():
             check_response = cursor.fetchone()
 
             if check_response[0] == 1:
-                show_options()
+                show_options(username)
             else:
                 print("\nUsername or password is incorrect. Please try again :)\n")
 
@@ -236,7 +277,7 @@ def login():
                 sys.stderr("Error logging in.")
 
 # Add user to 'user_info' and 'users' tables
-def add_user(username, email, password, is_client):
+def add_user(username, email, password, is_admin):
     """
     Adds the user to the users and user_info table.
 
@@ -249,13 +290,15 @@ def add_user(username, email, password, is_client):
     Return value: none.
     """
     cursor = conn.cursor()
-    sql_user_info = "CALL sp_add_user(%s, %s)"  # Call the stored procedure to add user to user_info table
+    sql_user_info = "CALL sp_add_user(%s, %s, %s)"  # Call the stored procedure to add user to user_info table
     sql_users = "INSERT INTO users (username, email, is_admin) VALUES (%s, %s, %s)"  # Add user to users table
     try:
         # Add user to user_info table
-        cursor.execute(sql_user_info, (username, password))
+        cursor.execute(sql_user_info, (username, password, is_admin))
         # Add user to users table
+
         cursor.execute(sql_users, (username, email, is_admin))
+        
         conn.commit()
         print(f"User '{username}' added successfully.")
     except mysql.connector.Error as err:
@@ -264,7 +307,7 @@ def add_user(username, email, password, is_client):
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
-def show_options():
+def show_options(username):
     """
     Displays options users can choose in the application, such as
     viewing <x>, filtering results with a flag (e.g. -s to sort),
@@ -289,32 +332,32 @@ def show_options():
         quit_ui()
     elif ans == 'a':
         print("VIEWING ALL BEYBLADES.")
-        print(view_all_beyblades())
-        show_options()
+        view_all_beyblades()
+        show_options(username)
     elif ans == 'b':
         print("VIEWING ALL BATTLE RESULTS FOR USER.")
-        # view_all_battle_results_for_user()
-        show_options()
+        view_all_battle_results_for_user(username)
+        show_options(username)
     elif ans == 'c':
         print("VIEWING ALL BATTLE RESULTS FOR TOURNAMENT.")
         # view_battle_results_for_tournament()
-        show_options()
+        show_options(username)
     elif ans == 'd':
         print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
         # view_battle_results_for_location()
-        show_options()
+        show_options(username)
     elif ans == 'e':
         print("VIEWING INFORMATION ABOUT A BEYBLADE.")
         # view_beyblade_info()
-        show_options()
+        show_options(username)
     elif ans == 'f':
         print("VIEWING INFORMATION ABOUT A PART.")
         # view_part_info()
-        show_options()
+        show_options(username)
     elif ans == 'g':
         print("VIEWING ALL USER BEYBLADES.")
         # view_user_beyblades()
-        show_options()
+        show_options(username)
     elif ans == 'h':
         # Prompt for Beyblade details and call add_beyblade function
         # TODO: Fix style here, keep it under 80 chars per line. 
@@ -328,7 +371,7 @@ def show_options():
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
         add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
-        show_options()
+        show_options(username)
     elif ans == 'i':
         # Prompt for user details and call a function to add the user
         # TODO: Fix style here, keep it under 80 chars per line. 
@@ -338,7 +381,7 @@ def show_options():
         user_input = input('Is the user an admin? (True/False): ').lower()
         is_client = user_input not in ['true', '1', 't', 'y', 'yes']
 
-        add_user(username, email, password, is_client)
+        add_user(username, email, password, 0)
     elif ans == 'q':
         quit_ui()
 
