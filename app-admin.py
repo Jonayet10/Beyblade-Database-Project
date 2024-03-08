@@ -513,6 +513,7 @@ def show_options():
     sending a request to do <x>, etc.
     """
     print('What would you like to do? ')
+    
     print('  (a) - Add a new Beyblade to database')
     print('  (b) - Add a new battle result')
     print('  (c) - Add a new user')
@@ -592,7 +593,7 @@ def show_options():
         view_all_battle_results_for_user(tournament_location)
         show_options()
     elif ans == 'i':
-        part_ID = input('Enter part ID')
+        part_ID = input('Enter part ID: ')
         view_part_info(part_ID)
         show_options()
     elif ans == 'j':

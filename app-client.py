@@ -340,7 +340,8 @@ def show_options(username):
         show_options(username)
     elif ans == 'c':
         print("VIEWING ALL BATTLE RESULTS FOR TOURNAMENT.")
-        # view_battle_results_for_tournament()
+        tournament = input('Tournament name: ')
+        view_battle_results_for_tournament(tournament)
         show_options(username)
     elif ans == 'd':
         print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
