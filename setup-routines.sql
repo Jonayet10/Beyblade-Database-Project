@@ -11,9 +11,10 @@
 -- Beyblade being inserted is stock, its just gonna take the beyblade_ID from
 -- the stock in 'beyblades' table.
 
+DROP PROCEDURE IF EXISTS sp_add_beyblade;
 DELIMITER !
 
-CREATE PROCEDURE `sp_add_beyblade`(
+CREATE PROCEDURE sp_add_beyblade(
     IN _user_id INT,
     IN _name VARCHAR(250),
     IN _type ENUM('Attack', 'Defense', 'Stamina', 'Balance'),
@@ -22,7 +23,7 @@ CREATE PROCEDURE `sp_add_beyblade`(
     IN _energy_ring_id VARCHAR(20),
     IN _fusion_wheel_id VARCHAR(20),
     IN _spin_track_id VARCHAR(20),
-    IN _performance_tip_id VARCHAR(20),
+    IN _performance_tip_id VARCHAR(20)
 )
 BEGIN
     DECLARE _beyblade_id VARCHAR(10);
@@ -74,6 +75,7 @@ DELIMITER ;
 --    _player2_beyblade_ID INT: The ID of the beyblade used by the second player.
 --    _winner_ID INT: The user ID of the winner of the battle. Can be NULL if the battle was a draw.
 
+DROP PROCEDURE IF EXISTS sp_record_battle;
 DELIMITER !
 
 CREATE PROCEDURE sp_record_battle(
@@ -98,6 +100,7 @@ DELIMITER ;
 -- whenever a  new row is inserted into it. Notably, new rows are inserted
 -- into this table in add_user function of app.py files, and they do not
 -- require date_joined as this is automatically done with the trigger.
+DROP TRIGGER IF EXISTS trg_update_date_joined;
 DELIMITER !
 
 CREATE TRIGGER trg_update_date_joined
@@ -114,6 +117,7 @@ DELIMITER ;
 -- It calculates the total weight of each beyblade by summing the weights of its constituent parts.
 -- The function accepts an input parameter of beyblade type (Attack, Defense, Stamina, Balance)
 -- and returns the beyblade_id of the heaviest beyblade within the specified type.
+DROP FUNCTION IF EXISTS udf_heaviest_beyblade_for_type;
 DELIMITER !
 
 CREATE FUNCTION udf_heaviest_beyblade_for_type(beyblade_type ENUM('Attack', 'Defense', 'Stamina', 'Balance'))

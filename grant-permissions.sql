@@ -32,11 +32,11 @@ GRANT SELECT ON beybladedb.parts TO 'midoriyai'@'localhost';
 GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'gokus'@'localhost';
 GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'midoriyai'@'localhost';
 
--- Grant EXECUTE permission on the AddCustomBeyblade procedure to Bladers
+-- Grant EXECUTE permission on the sp_add_beyblade procedure to Bladers
 -- This allows Bladers to perform actions encapsulated by the procedure, even
 -- if they don't have direct permissions to perform those actions on the
 -- underlying tables ('beyblades' table)
-GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'gokus'@'localhost';
-GRANT EXECUTE ON PROCEDURE beybladedb.AddCustomBeyblade TO 'midoriyai'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'gokus'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'midoriyai'@'localhost';
 
 FLUSH PRIVILEGES;

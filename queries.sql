@@ -1,3 +1,5 @@
+-- NEED TO FIX ERRORS FOR THIS
+
 -- Retrieves the ID of the heaviest Beyblade of a given type by summing the weights of its parts
 SELECT b.beyblade_id INTO heaviest_beyblade_id
 FROM beyblades AS b
