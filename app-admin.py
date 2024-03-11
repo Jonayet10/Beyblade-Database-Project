@@ -506,42 +506,45 @@ def add_user(username, email, password, is_admin):
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
+        
 def show_options():
     """
     Displays options users can choose in the application, such as
     viewing <x>, filtering results with a flag (e.g. -s to sort),
     sending a request to do <x>, etc.
     """
-    print('What would you like to do? ')
-    
-    print('  (a) - Add a new Beyblade to database')
-    print('  (b) - Add a new battle result')
-    print('  (c) - Add a new user')
-    print('  (d) - View current users')
+    print('What would you like to do?')
     print('\n')
 
-    print('  (e) - View all Beyblades')
-    print('  (f) - View a user\'s battle results')
-    print('  (g) - View battle results for a tournament')
-    print('  (h) - View battle results for location')
+    print('* Add Entities: ')
+    print('  (a) Add a new Beyblade to the database')
+    print('  (b) Add a Beyblade to your account')
+    print('  (c) Add a new battle result')
+    print('  (d) Add a new user')
     print('\n')
 
-    print('  (i) - View part information')
-    print('  (j) - View Beyblade ID and Name of user\'s Beyblades')
-    print('  (k) - View parts of a Beyblade')
-    print('  (l) - Add a Beyblade to your account')
+    print('* View Beyblade Information: ')
+    print('  (e) View all Beyblades')
+    print('  (f) View Beyblades from a user\'s collection')
+    print('  (g) View parts of a Beyblade')
+    print('  (h) View part information')
+    print('  (i) View the heaviest Beyblade for a type')
     print('\n')
 
-    print('  (m) - View the heaviest Beyblade by type')
+    print('* View Battle Information: ')
+    print('  (j) View all tournament names')
+    print('  (k) View battle results for a tournament')
+    print('  (l) View all battle locations')
+    print('  (m) View battle results for a location')
+    print('  (n) View current users')
+    print('  (o) View battle results for a user')
 
-    # Add more options as needed
     print('  (q) - quit')
     ans = input('Enter an option: ').lower()
 
     if ans == 'q':
         quit_ui()
     elif ans == 'a':
-        # Prompt for Beyblade details and call add_beyblade function
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
@@ -554,7 +557,18 @@ def show_options():
         add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options()
     elif ans == 'b':
-        # Prompt for battle details and call a function to add battle result
+        name = input('Enter Beyblade name: ')
+        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
+        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
+        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
+        face_bolt_id = input('Enter Face Bolt ID: ')
+        energy_ring_id = input('Enter Energy Ring ID: ')
+        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
+        spin_track_id = input('Enter Spin Track ID: ')
+        performance_tip_id = input('Enter Performance Tip ID: ')
+        add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options()
+    elif ans == 'c':
         tournament_name = input('Enter tournament name: ')
         date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
         location = input('Enter location: ')
@@ -566,62 +580,53 @@ def show_options():
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
         show_options()
-    elif ans == 'c':
-        # Prompt for user details and call a function to add the user
+    elif ans == 'd':
         username = input('Enter username: ')
         email = input('Enter email: ')
         password = input('Enter password: ')
         is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         add_user(username, email, password, is_admin)
         show_options()
-    elif ans == 'd':
-        view_users()
-        show_options()
     elif ans == 'e':
         view_all_beyblades()
         show_options()
     elif ans == 'f':
-        username = input('Enter username: ')
-        view_all_battle_results_for_user(username)
-        show_options()
-    elif ans == 'g':
-        tournament_name = input('Enter tournament name: ')
-        view_battle_results_for_tournament(tournament_name)
-        show_options()
-    elif ans == 'h':
-        tournament_location = input('Enter tournament location: ')
-        view_all_battle_results_for_user(tournament_location)
-        show_options()
-    elif ans == 'i':
-        part_ID = input('Enter part ID: ')
-        view_part_info(part_ID)
-        show_options()
-    elif ans == 'j':
         user_name = input('Enter username: ')
         view_user_beyblades(user_name)
         show_options()
-    elif ans == 'k':
+    elif ans == 'g':
         beyblade_ID = input('Enter Beyblade ID: ')
         view_beyblade_parts(beyblade_ID)
         show_options()
-    elif ans == 'l':
-        name = input('Enter Beyblade name: ')
-        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
-        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
-        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
-        face_bolt_id = input('Enter Face Bolt ID: ')
-        energy_ring_id = input('Enter Energy Ring ID: ')
-        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
-        spin_track_id = input('Enter Spin Track ID: ')
-        performance_tip_id = input('Enter Performance Tip ID: ')
-        add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
-    elif ans == 'm':
+    elif ans == 'h':
+        part_ID = input('Enter part ID: ')
+        view_part_info(part_ID)
+        show_options()
+    elif ans == 'i':
         beyblade_type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         udf_heaviest_beyblade_for_type(beyblade_type)
         show_options()
-    elif ans == 'q':
-        quit_ui() 
-
+    elif ans == 'j':
+        # TODO
+        show_options()
+    elif ans == 'k':
+        tournament_name = input('Enter tournament name: ')
+        view_battle_results_for_tournament(tournament_name)
+        show_options()
+    elif ans == 'l':
+        # TODO
+        show_options()
+    elif ans == 'm':
+        tournament_location = input('Enter tournament location: ')
+        view_battle_results_for_location(tournament_location)
+        show_options()
+    elif ans == 'n':
+        view_users()
+        show_options()
+    elif ans == 'o':
+        username = input('Enter username: ')
+        view_all_battle_results_for_user(username)
+        show_options()
 def quit_ui():
     """
     Quits the program, printing a good bye message to the user.
