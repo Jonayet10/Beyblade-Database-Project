@@ -111,6 +111,56 @@ def view_users():
     finally:
         cursor.close()
 
+def view_user_beyblades(user_name):
+    """
+    Queries the database for all Beyblades owned by a specific user and prints
+    their beyblade_ID, name, and custom status in a well-formatted table.
+    
+    Arguments:
+        user_name (str) - The username of the user.
+    Returns: Prints the Beyblade ID, Name, and Custom Status of the user's Beyblades
+    """
+    conn = get_conn() 
+    cursor = conn.cursor()
+
+    query = """
+    SELECT b.beyblade_ID, b.name, b.is_custom
+    FROM beyblades b
+    JOIN userbeyblades ub ON b.beyblade_ID = ub.beyblade_ID
+    JOIN users u ON ub.user_ID = u.user_ID
+    WHERE u.username = %s;
+    """
+    cursor.execute(query, (user_name,))
+
+    results = cursor.fetchall()
+    headers = ["Beyblade ID", "Name", "Is Custom"]
+
+    if results:
+        # Convert is_custom boolean to a more readable format (Yes/No)
+        formatted_results = [(id, name, "Yes" if is_custom else "No") for id, name, is_custom in results]
+        print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
+    else:
+        print(f"No Beyblades found for user: {user_name}")
+
+    cursor.close()
+    conn.close()
+
+def add_beyblade_part(part_ID, part_type, weight, description):
+    cursor = conn.cursor()
+    # SQL INSERT statement for the parts table
+    sql = ("INSERT INTO parts (part_ID, part_type, weight, description) "
+           "VALUES (%s, %s, %s, %s)")
+    # Data tuple for the values to insert
+    data = (part_ID, part_type, weight, description)
+    
+    try:
+        cursor.execute(sql, data)
+        conn.commit()  # Commit the transaction to save the changes
+        print(f"Added new part: {part_ID} successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
 # -------------------------------------------- Functions that also the client has ---------------------------------------------------
 def view_all_beyblades():
     """
@@ -272,7 +322,6 @@ def view_battle_results_for_location(location):
     cursor.close()
     conn.close()
 
-
 def view_part_info(part_id):
     """
     Queries the parts table for information about a specific part given its part_ID.
@@ -308,42 +357,6 @@ def view_part_info(part_id):
     cursor.close()
     conn.close()
 
-
-def view_user_beyblades(user_name):
-    """
-    Queries the database for all Beyblades owned by a specific user and prints
-    their beyblade_ID, name, and custom status in a well-formatted table.
-    
-    Arguments:
-        user_name (str) - The username of the user.
-    Returns: Prints the Beyblade ID, Name, and Custom Status of the user's Beyblades
-    """
-    conn = get_conn() 
-    cursor = conn.cursor()
-
-    query = """
-    SELECT b.beyblade_ID, b.name, b.is_custom
-    FROM beyblades b
-    JOIN userbeyblades ub ON b.beyblade_ID = ub.beyblade_ID
-    JOIN users u ON ub.user_ID = u.user_ID
-    WHERE u.username = %s;
-    """
-    cursor.execute(query, (user_name,))
-
-    results = cursor.fetchall()
-    headers = ["Beyblade ID", "Name", "Is Custom"]
-
-    if results:
-        # Convert is_custom boolean to a more readable format (Yes/No)
-        formatted_results = [(id, name, "Yes" if is_custom else "No") for id, name, is_custom in results]
-        print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
-    else:
-        print(f"No Beyblades found for user: {user_name}")
-
-    cursor.close()
-    conn.close()
-
-
 def view_beyblade_parts(beyblade_id):
     """
     Queries the database for the names and weights of all parts that make up a specific
@@ -376,6 +389,7 @@ def view_beyblade_parts(beyblade_id):
 
     cursor.close()
     conn.close()
+
 
 def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id, 
                       fusion_wheel_id, spin_track_id, performance_tip_id):
@@ -454,23 +468,6 @@ def heaviest_beyblade_for_type(beyblade_type):
     cursor.close()
     conn.close()
 
-def add_beyblade_part(part_ID, part_type, weight, description):
-    cursor = conn.cursor()
-    # SQL INSERT statement for the parts table
-    sql = ("INSERT INTO parts (part_ID, part_type, weight, description) "
-           "VALUES (%s, %s, %s, %s)")
-    # Data tuple for the values to insert
-    data = (part_ID, part_type, weight, description)
-    
-    try:
-        cursor.execute(sql, data)
-        conn.commit()  # Commit the transaction to save the changes
-        print(f"Added new part: {part_ID} successfully.")
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-    finally:
-        cursor.close()
-
 def view_all_beyblade_parts():
     conn = get_conn()  
     cursor = conn.cursor()
@@ -539,6 +536,37 @@ def view_all_battle_locations():
     finally:
         cursor.close()
         conn.close()  # Closing the connection when done
+def beyblade_leaderboard():
+    """
+    Prints a leaderboard of Beyblades based on their wins in battles.
+    """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(*) as wins
+    FROM battles b
+    INNER JOIN userbeyblades ub ON b.winner_ID = ub.user_beyblade_ID
+    INNER JOIN beyblades bb ON ub.beyblade_ID = bb.beyblade_ID
+    GROUP BY bb.beyblade_ID, bb.name, bb.type
+    ORDER BY wins DESC, bb.name;
+    """
+
+    try:
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if results:
+            print("\nBeyblade Leaderboard (Most Wins):")
+            headers = ['Beyblade ID', 'Name', 'Type', 'Wins']
+            print(tabulate(results, headers=headers, tablefmt="grid"))
+        else:
+            print("No battle results found.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
 
 
 # ----------------------------------------------------------------------
@@ -663,6 +691,7 @@ def show_options(username):
     print('  (o) View battle results for a location')   # GOOD
     print('  (p) View current users')   # GOOD
     print('  (r) View battle results for a user')   # GOOD
+    print('  (s) Print Beyblades leaderboard')
     print('\n')
 
     print('  (q) - quit')
@@ -785,6 +814,10 @@ def show_options(username):
         # View a user's battle results, names, IDs, winners
         username = input('Enter username: ')
         view_all_battle_results_for_user(username)
+        show_options(username)
+    elif ans == 's':
+        # Prints a leaderboard of the Beyblades that won the most
+        beyblade_leaderboard()
         show_options(username)
 
 def quit_ui():
