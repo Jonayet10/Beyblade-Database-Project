@@ -97,3 +97,6 @@ CREATE TABLE battles (
     FOREIGN KEY (player2_beyblade_ID) REFERENCES userbeyblades(user_beyblade_ID),
     FOREIGN KEY (winner_ID) REFERENCES userbeyblades(user_beyblade_ID)
 );
+
+CREATE INDEX idx_userbeyblades_user_id ON userbeyblades(user_ID);
+CREATE INDEX idx_userbeyblades_beyblade_id ON userbeyblades(beyblade_ID);
