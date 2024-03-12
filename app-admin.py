@@ -608,35 +608,34 @@ def show_options(username):
     print('\n')
 
     print('* Add Entities: ')
-    print('  (a) Add a new Beyblade to the database')  # GOOD
-    print('  (b) Add a Beyblade to your account')
-    print('  (c) Add a new battle result')  # GOOD
-    print('  (d) Add a new user')   # GOOD
+    print('  (a) Add a part to the database')  # GOOD
+    print('  (b) Add a new Beyblade to the database')  # GOOD
+    print('  (c) Add a Beyblade to your account')
+    print('  (d) Add a new battle result')  # GOOD
+    print('  (e) Add a new user')   # GOOD
     print('\n')
 
     print('* View Beyblade Information: ')
 
-    print('  (e) View all Beyblades')   # GOOD
-    print('  (f) View Beyblades from a user\'s collection') # GOOD
-    print('  (g) View parts of a Beyblade') # GOOD
-    print('  (h) View part information')    # GOOD
-    print('  (i) View the heaviest Beyblade for a type')    # GOOD
+    print('  (f) View all Beyblades')   # GOOD
+    print('  (g) View Beyblades from a user\'s collection') # GOOD
+    print('  (h) View all parts in the database')  # GOOD
+    print('  (i) View parts of a Beyblade') # GOOD
+    print('  (j) View part information')    # GOOD
+    print('  (k) View the heaviest Beyblade for a type')    # GOOD
     print('\n')
 
     print('* View Battle Information: ')
 
-    print('  (j) View all tournament names')    # GOOD
-    print('  (k) View battle results for a tournament') # GOOD
-    print('  (l) View all battle locations')    # GOOD
-    print('  (m) View battle results for a location')   # GOOD
-    print('  (n) View current users')   # GOOD
-    print('  (o) View battle results for a user')   # GOOD
+    print('  (l) View all tournament names')    # GOOD
+    print('  (m) View battle results for a tournament') # GOOD
+    print('  (n) View all battle locations')    # GOOD
+    print('  (o) View battle results for a location')   # GOOD
+    print('  (p) View current users')   # GOOD
+    print('  (r) View battle results for a user')   # GOOD
     print('\n')
 
     print('* New functions, will add to list above: ')
-
-    print('  (p) Add a part to the database')  # GOOD
-    print('  (r) View all parts in the database')  # GOOD
 
     print('\n')
     print('  (q) - quit')
@@ -645,6 +644,20 @@ def show_options(username):
     if ans == 'q':
         quit_ui()
     elif ans == 'a':
+        # Add a record to parts table
+        part_ID = input('Enter Part ID: ')
+        part_type = input('Enter Part Type (Face Bolt, Energy Ring, Fusion Wheel, Spin Track, Performance Tip): ')
+        weight = input('Enter Weight (in grams): ')
+        description = input('Enter Decription: ')
+        try:
+            weight = float(weight)
+        except ValueError:
+            print("Invalid weight. Please enter a numeric value.")
+            show_options()
+            return
+        add_beyblade_part(part_ID, part_type, weight, description)
+        show_options(username)
+    elif ans == 'b':
         # Adds full Beyblade to database 
         # Just the parts need to be in the database for the Beyblade being added
         beyblade_ID = input('Enter Beyblade ID: ')
@@ -659,7 +672,7 @@ def show_options(username):
         performance_tip_id = input('Enter Performance Tip ID: ')
         add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options(username)
-    elif ans == 'b':
+    elif ans == 'c':
         # Adds a Beyblade to the account that is logged in right now
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
@@ -672,7 +685,7 @@ def show_options(username):
         performance_tip_id = input('Enter Performance Tip ID: ')
         add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options(username)
-    elif ans == 'c':
+    elif ans == 'd':
         # Adds a new record to battles table
         tournament_name = input('Enter tournament name: ')
         date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
@@ -685,7 +698,7 @@ def show_options(username):
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
         show_options(username)
-    elif ans == 'd':
+    elif ans == 'e':
         # Add a new record to users table, also adds to user_info table for password authentication
         # It works to then log in with this new user and pass with app-admin (if admin) or app-client (if client)
         username = input('Enter username: ')
@@ -694,73 +707,60 @@ def show_options(username):
         is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         add_user(username, email, password, is_admin)
         show_options(username)
-    elif ans == 'e':
+    elif ans == 'f':
         # View beyblades table
         view_all_beyblades()
         show_options(username)
-    elif ans == 'f':
+    elif ans == 'g':
         # View userbeyblades/collection given username
         user_name = input('Enter username: ')
         view_user_beyblades(user_name)
         show_options(username)
-    elif ans == 'g':
+    elif ans == 'h':
+        # Shows all records in parts table
+        view_all_beyblade_parts()
+        show_options(username)
+    elif ans == 'i':
         # View part records of individual parts in Beyblade
         beyblade_ID = input('Enter Beyblade ID: ')
         view_beyblade_parts(beyblade_ID)
         show_options(username)
-    elif ans == 'h':
+    elif ans == 'j':
         # View part type, weight (g), and description of a part
         part_ID = input('Enter part ID: ')
         view_part_info(part_ID)
         show_options(username)
-    elif ans == 'i':
+    elif ans == 'k':
         # Return the Beyblade ID of the heaviest Beyblade for a certain type
         beyblade_type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         heaviest_beyblade_for_type(beyblade_type)
         show_options(username)
-    elif ans == 'j':
+    elif ans == 'l':
         # Prints list of distinct tournament names present in battles table
         view_all_tournament_names()
         show_options(username)
-    elif ans == 'k':
+    elif ans == 'm':
         tournament_name = input('Enter tournament name: ')
         view_battle_results_for_tournament(tournament_name)
         show_options(username)
-    elif ans == 'l':
+    elif ans == 'n':
         # Prints list of distinct battle locations present in battles table
         view_all_battle_locations()
         show_options(username)
-    elif ans == 'm':
+    elif ans == 'o':
         tournament_location = input('Enter tournament location: ')
         view_battle_results_for_location(tournament_location)
         show_options(username)
-    elif ans == 'n':
+    elif ans == 'p':
         # View the users table
         view_users()
         show_options(username)
-    elif ans == 'o':
+    elif ans == 'r':
         # View a user's battle results, names, IDs, winners
         username = input('Enter username: ')
         view_all_battle_results_for_user(username)
         show_options(username)
-    elif ans == 'p':
-        # Add a record to parts table
-        part_ID = input('Enter Part ID: ')
-        part_type = input('Enter Part Type (Face Bolt, Energy Ring, Fusion Wheel, Spin Track, Performance Tip): ')
-        weight = input('Enter Weight (in grams): ')
-        description = input('Enter Decription: ')
-        try:
-            weight = float(weight)
-        except ValueError:
-            print("Invalid weight. Please enter a numeric value.")
-            show_options()
-            return
-        add_beyblade_part(part_ID, part_type, weight, description)
-        show_options(username)
-    elif ans == 'r':
-        # Shows all records in parts table
-        view_all_beyblade_parts()
-        show_options(username)
+
 def quit_ui():
     """
     Quits the program, printing a good bye message to the user.
