@@ -750,7 +750,7 @@ def show_options(username):
         # View part records of individual parts in Beyblade
         beyblade_ID = input('Enter Beyblade ID: ')
         view_beyblade_parts(beyblade_ID)
-        show_options(username)
+        show_options(username) 
     elif ans == 'j':
         # View part type, weight (g), and description of a part
         part_ID = input('Enter part ID: ')
