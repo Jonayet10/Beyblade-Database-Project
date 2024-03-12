@@ -25,29 +25,22 @@ GRANT ALL PRIVILEGES ON beybladedb.* TO 'dpasha'@'localhost';
 -- Grant SELECT permission on beyblades and parts tables to Bladers
 GRANT SELECT ON beybladedb.beyblades TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.parts TO 'gokus'@'localhost';
-GRANT SELECT ON beybladedb.userbeyblades TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.beyblades TO 'midoriyai'@'localhost';
 GRANT SELECT ON beybladedb.parts TO 'midoriyai'@'localhost';
-GRANT SELECT ON beybladedb.userbeyblades TO 'midoriyai'@'localhost';
-
--- Grand SELECT permission on users to all clients
-GRANT SELECT ON beybladedb.users TO 'gokus'@'localhost';
-GRANT SELECT ON beybladedb.users TO 'midoriyai'@'localhost';
 
 -- Grant INSERT, UPDATE, and DELETE permissions on userbeyblades table to Bladers
 GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'gokus'@'localhost';
 GRANT INSERT, UPDATE, DELETE ON beybladedb.userbeyblades TO 'midoriyai'@'localhost';
 
--- Grant EXECUTE permission on the AddCustomBeyblade procedure to Bladers
+-- Grant EXECUTE permission on the sp_add_beyblade procedure to Bladers
 -- This allows Bladers to perform actions encapsulated by the procedure, even
 -- if they don't have direct permissions to perform those actions on the
 -- underlying tables ('beyblades' table)
 GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'gokus'@'localhost';
 GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'midoriyai'@'localhost';
-GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'gokus'@'localhost';
-GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'midoriyai'@'localhost';
 
-GRANT SELECT ON beybladedb.battles TO 'gokus'@'localhost';
-GRANT SELECT ON beybladedb.battles TO 'midoriyai'@'localhost';
+-- Grant SELECT priveleges for logging in
+GRANT SELECT ON beybladedb.* TO 'gokus'@'localhost';
+GRANT SELECT ON beybladedb.* TO 'midoriyai'@'localhost';
 
 FLUSH PRIVILEGES;

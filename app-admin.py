@@ -394,7 +394,7 @@ def add_user_beyblade(name, type, series, face_bolt_id, energy_ring_id,
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-def udf_heaviest_beyblade_for_type(beyblade_type):
+def heaviest_beyblade_for_type(beyblade_type):
     """
     Fetches and displays the ID and name of the heaviest Beyblade of a specific type.
     Arguments:
@@ -403,8 +403,8 @@ def udf_heaviest_beyblade_for_type(beyblade_type):
     conn = get_conn()
     cursor = conn.cursor()
 
-    # Call the UDF `get_heaviest_beyblade_id` passing the beyblade type
-    query = f"SELECT get_heaviest_beyblade_id('{beyblade_type}') AS heaviest_beyblade_id;"
+    # Call the UDF `udf_heaviest_beyblade_for_type` passing the beyblade type
+    query = f"SELECT udf_heaviest_beyblade_for_type('{beyblade_type}') AS heaviest_beyblade_id;"
     cursor.execute(query)
 
     # Fetching the result which is the ID of the heaviest beyblade
@@ -442,7 +442,7 @@ def add_beyblade_part(part_ID, part_type, weight, description):
         cursor.close()
 
 def view_all_beyblade_parts():
-    conn = get_conn()  # Ensure you have a function or a way to get your database connection
+    conn = get_conn()  
     cursor = conn.cursor()
     
     # SQL query to select all parts
@@ -462,7 +462,53 @@ def view_all_beyblade_parts():
         print(f"Error: {err}")
     finally:
         cursor.close()
-        conn.close()  # Remember to close your connection when you're done
+        conn.close()  
+
+def view_all_tournament_names():
+    conn = get_conn()  
+    cursor = conn.cursor()
+
+    # SQL query to select distinct tournament names
+    sql = "SELECT DISTINCT tournament_name FROM battles ORDER BY tournament_name;"
+
+    try:
+        cursor.execute(sql)
+        tournaments = cursor.fetchall()  # Fetch all results
+
+        if tournaments:
+            print("\nList of Tournament Names:")
+            for tournament in tournaments:
+                print(tournament[0])  # Print each tournament name
+        else:
+            print("No tournaments found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  
+
+def view_all_battle_locations():
+    conn = get_conn()  # Way to get database connection
+    cursor = conn.cursor()
+
+    # SQL query to select distinct battle locations
+    sql = "SELECT DISTINCT location FROM battles ORDER BY location;"
+
+    try:
+        cursor.execute(sql)
+        locations = cursor.fetchall()  # Fetch all results
+
+        if locations:
+            print("\nList of Battle Locations:")
+            for location in locations:
+                print(location[0])  # Print each location
+        else:
+            print("No battle locations found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  # Closing the connection when done
 
 
 # ----------------------------------------------------------------------
@@ -564,8 +610,8 @@ def show_options(username):
     print('* Add Entities: ')
     print('  (a) Add a new Beyblade to the database')  # GOOD
     print('  (b) Add a Beyblade to your account')
-    print('  (c) Add a new battle result')
-    print('  (d) Add a new user')
+    print('  (c) Add a new battle result')  # GOOD
+    print('  (d) Add a new user')   # GOOD
     print('\n')
 
     print('* View Beyblade Information: ')
@@ -574,23 +620,23 @@ def show_options(username):
     print('  (f) View Beyblades from a user\'s collection') # GOOD
     print('  (g) View parts of a Beyblade') # GOOD
     print('  (h) View part information')    # GOOD
-    print('  (i) View the heaviest Beyblade for a type')
+    print('  (i) View the heaviest Beyblade for a type')    # GOOD
     print('\n')
 
     print('* View Battle Information: ')
 
-    print('  (j) View all tournament names')    # TODO
-    print('  (k) View battle results for a tournament')
-    print('  (l) View all battle locations')    # TODO
-    print('  (m) View battle results for a location')
+    print('  (j) View all tournament names')    # GOOD
+    print('  (k) View battle results for a tournament') # GOOD
+    print('  (l) View all battle locations')    # GOOD
+    print('  (m) View battle results for a location')   # GOOD
     print('  (n) View current users')   # GOOD
     print('  (o) View battle results for a user')   # GOOD
     print('\n')
 
     print('* New functions, will add to list above: ')
 
-    print('  (p) Add a Beyblade part to database')  # GOOD
-    print('  (r) View all Beyblade parts in the Database')  # GOOD
+    print('  (p) Add a part to the database')  # GOOD
+    print('  (r) View all parts in the database')  # GOOD
 
     print('\n')
     print('  (q) - quit')
@@ -614,6 +660,7 @@ def show_options(username):
         add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options(username)
     elif ans == 'b':
+        # Adds a Beyblade to the account that is logged in right now
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
@@ -626,6 +673,7 @@ def show_options(username):
         add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options(username)
     elif ans == 'c':
+        # Adds a new record to battles table
         tournament_name = input('Enter tournament name: ')
         date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
         location = input('Enter location: ')
@@ -638,6 +686,8 @@ def show_options(username):
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
         show_options(username)
     elif ans == 'd':
+        # Add a new record to users table, also adds to user_info table for password authentication
+        # It works to then log in with this new user and pass with app-admin (if admin) or app-client (if client)
         username = input('Enter username: ')
         email = input('Enter email: ')
         password = input('Enter password: ')
@@ -664,18 +714,21 @@ def show_options(username):
         view_part_info(part_ID)
         show_options(username)
     elif ans == 'i':
+        # Return the Beyblade ID of the heaviest Beyblade for a certain type
         beyblade_type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
-        udf_heaviest_beyblade_for_type(beyblade_type)
+        heaviest_beyblade_for_type(beyblade_type)
         show_options(username)
     elif ans == 'j':
-        # TODO
+        # Prints list of distinct tournament names present in battles table
+        view_all_tournament_names()
         show_options(username)
     elif ans == 'k':
         tournament_name = input('Enter tournament name: ')
         view_battle_results_for_tournament(tournament_name)
         show_options(username)
     elif ans == 'l':
-        # TODO
+        # Prints list of distinct battle locations present in battles table
+        view_all_battle_locations()
         show_options(username)
     elif ans == 'm':
         tournament_location = input('Enter tournament location: ')
