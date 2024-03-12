@@ -27,7 +27,7 @@ CREATE TABLE parts (
     -- Type of the part 
     part_type ENUM('Face Bolt', 'Energy Ring', 'Fusion Wheel', 'Spin Track', 'Performance Tip') NOT NULL,
     -- Weight of the part in grams
-    weight DECIMAL(4,2),
+    weight DECIMAL(4,2) NOT NULL,
     -- Brief description of the part
     description TEXT
 );
@@ -43,13 +43,13 @@ CREATE TABLE beyblades (
     -- Flag to indicate whether the Beyblade is custom-made
     is_custom BOOLEAN NOT NULL,
     -- Series the Beyblade is from
-    series ENUM('Metal Fusion', 'Metal Masters', 'Metal Fury'),
+    series ENUM('Metal Fusion', 'Metal Masters', 'Metal Fury') NOT NULL,
     -- Foreign keys linking to the parts table
-    face_bolt_ID VARCHAR(20),
-    energy_ring_ID VARCHAR(20),
-    fusion_wheel_ID VARCHAR(20),
-    spin_track_ID VARCHAR(20),
-    performance_tip_ID VARCHAR(20),
+    face_bolt_ID VARCHAR(20) NOT NULL,
+    energy_ring_ID VARCHAR(20) NOT NULL,
+    fusion_wheel_ID VARCHAR(20) NOT NULL,
+    spin_track_ID VARCHAR(20) NOT NULL,
+    performance_tip_ID VARCHAR(20) NOT NULL,
     FOREIGN KEY (face_bolt_ID) REFERENCES parts(part_ID),
     FOREIGN KEY (energy_ring_ID) REFERENCES parts(part_ID),
     FOREIGN KEY (fusion_wheel_ID) REFERENCES parts(part_ID),
@@ -76,7 +76,7 @@ CREATE TABLE battles (
     -- Unique identifier for each Battle
     battle_ID INT AUTO_INCREMENT PRIMARY KEY,
     -- Name of the tournament the battle is from
-    tournament_name VARCHAR(250),
+    tournament_name VARCHAR(250) NOT NULL,
     -- Date of the battle
     date DATETIME NOT NULL,
     -- Lovation of the battle

@@ -312,17 +312,17 @@ def view_part_info(part_id):
 def view_user_beyblades(user_name):
     """
     Queries the database for all Beyblades owned by a specific user and prints
-    their beyblade_ID and name in a well-formatted table.
+    their beyblade_ID, name, and custom status in a well-formatted table.
     
     Arguments:
         user_name (str) - The username of the user.
-    Returns: Prints the Beyblade ID and Name of the user's Beyblades
+    Returns: Prints the Beyblade ID, Name, and Custom Status of the user's Beyblades
     """
-    conn = get_conn()
+    conn = get_conn() 
     cursor = conn.cursor()
 
     query = """
-    SELECT b.beyblade_ID, b.name
+    SELECT b.beyblade_ID, b.name, b.is_custom
     FROM beyblades b
     JOIN userbeyblades ub ON b.beyblade_ID = ub.beyblade_ID
     JOIN users u ON ub.user_ID = u.user_ID
@@ -331,15 +331,18 @@ def view_user_beyblades(user_name):
     cursor.execute(query, (user_name,))
 
     results = cursor.fetchall()
-    headers = ["Beyblade ID", "Name"]
+    headers = ["Beyblade ID", "Name", "Is Custom"]
 
     if results:
-        print(tabulate(results, headers=headers, tablefmt="grid"))
+        # Convert is_custom boolean to a more readable format (Yes/No)
+        formatted_results = [(id, name, "Yes" if is_custom else "No") for id, name, is_custom in results]
+        print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
     else:
         print(f"No Beyblades found for user: {user_name}")
 
     cursor.close()
     conn.close()
+
 
 def view_beyblade_parts(beyblade_id):
     """
@@ -374,25 +377,52 @@ def view_beyblade_parts(beyblade_id):
     cursor.close()
     conn.close()
 
-def add_user_beyblade(name, type, series, face_bolt_id, energy_ring_id, 
-                 fusion_wheel_id, spin_track_id, performance_tip_id):
+def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id, 
+                      fusion_wheel_id, spin_track_id, performance_tip_id):
     """
     Adds the beyblade to the beyblades and userbeyblades table.
 
     Arguments:
-        name (str) ... (so on.) TODO
+        username (str): Username of the user adding the Beyblade.
+        name (str): Name of the Beyblade.
+        type (str): Type of the Beyblade (Attack, Defense, Stamina, Balance).
+        series (str): Series the Beyblade belongs to (Metal Fusion, Metal Masters, Metal Fury).
+        face_bolt_id (str): ID of the Face Bolt part.
+        energy_ring_id (str): ID of the Energy Ring part.
+        fusion_wheel_id (str): ID of the Fusion Wheel part.
+        spin_track_id (str): ID of the Spin Track part.
+        performance_tip_id (str): ID of the Performance Tip part.
     
     Return value: none.
     """
     cursor = conn.cursor()
-    sql = ("CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s)")
-    data = (name, type, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+
+    # SQL query to fetch user_id based on username
+    sql_get_user_id = "SELECT user_ID FROM users WHERE username = %s;"
     try:
-        cursor.execute(sql, data)
-        conn.commit()
-        print(f"Added new Beyblade: {name}")
+        cursor.execute(sql_get_user_id, (username,))
+        user_id_row = cursor.fetchone()
+        if user_id_row is not None:
+            user_id = user_id_row[0]
+        else:
+            print(f"Error: User '{username}' not found.")
+            return
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
+        print(f"Error fetching user ID: {err}")
+        return
+
+    # Now, call the stored procedure with the obtained user_id
+    sql_call_sp = "CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    data = (user_id, name, type, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+    try:
+        cursor.execute(sql_call_sp, data)
+        conn.commit()
+        print(f"Added new Beyblade: {name} for user {username}")
+    except mysql.connector.Error as err:
+        print(f"Error adding Beyblade: {err}")
+    finally:
+        cursor.close()
+
 
 def heaviest_beyblade_for_type(beyblade_type):
     """
@@ -635,9 +665,6 @@ def show_options(username):
     print('  (r) View battle results for a user')   # GOOD
     print('\n')
 
-    print('* New functions, will add to list above: ')
-
-    print('\n')
     print('  (q) - quit')
     ans = input('Enter an option: ').lower()
 
@@ -677,13 +704,12 @@ def show_options(username):
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
-        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         face_bolt_id = input('Enter Face Bolt ID: ')
         energy_ring_id = input('Enter Energy Ring ID: ')
         fusion_wheel_id = input('Enter Fusion Wheel ID: ')
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
-        add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
         show_options(username)
     elif ans == 'd':
         # Adds a new record to battles table
