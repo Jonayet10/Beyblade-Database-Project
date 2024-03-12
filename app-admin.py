@@ -62,17 +62,20 @@ def get_conn():
 # Functions for Command-Line Options/Query Execution
 # ----------------------------------------------------------------------
 
-def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id):
+def add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID):
     cursor = conn.cursor()
-    sql = ("INSERT INTO beyblades (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id) "
-           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    data = (name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+    # Corrected SQL INSERT statement with accurate column names
+    sql = ("INSERT INTO beyblades (beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID) "
+           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    # The data tuple matches the corrected SQL statement
+    data = (beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID)
     try:
         cursor.execute(sql, data)
         conn.commit()
         print(f"Added new Beyblade: {name}")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
+
 
 def add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id):
     cursor = conn.cursor()
@@ -421,6 +424,47 @@ def udf_heaviest_beyblade_for_type(beyblade_type):
     cursor.close()
     conn.close()
 
+def add_beyblade_part(part_ID, part_type, weight, description):
+    cursor = conn.cursor()
+    # SQL INSERT statement for the parts table
+    sql = ("INSERT INTO parts (part_ID, part_type, weight, description) "
+           "VALUES (%s, %s, %s, %s)")
+    # Data tuple for the values to insert
+    data = (part_ID, part_type, weight, description)
+    
+    try:
+        cursor.execute(sql, data)
+        conn.commit()  # Commit the transaction to save the changes
+        print(f"Added new part: {part_ID} successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+
+def view_all_beyblade_parts():
+    conn = get_conn()  # Ensure you have a function or a way to get your database connection
+    cursor = conn.cursor()
+    
+    # SQL query to select all parts
+    sql = "SELECT part_ID, part_type, weight, description FROM parts ORDER BY part_type, part_ID;"
+    
+    try:
+        cursor.execute(sql)
+        parts = cursor.fetchall()  # Fetch all results
+        
+        if parts:
+            # Printing the results in a table format
+            print("\nBeyblade Parts List:")
+            print(tabulate(parts, headers=['Part ID', 'Part Type', 'Weight (g)', 'Description'], tablefmt="grid"))
+        else:
+            print("No parts found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  # Remember to close your connection when you're done
+
+
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
 # ----------------------------------------------------------------------
@@ -476,7 +520,7 @@ def login():
             check_response = cursor.fetchone()
 
             if check_response[0] == 1:
-                show_options()
+                show_options(username)
             else:
                 print("\nUsername or password is incorrect. Please try again :)\n")
 
@@ -507,55 +551,68 @@ def add_user(username, email, password, is_admin):
 # Command-Line Functionality
 # ----------------------------------------------------------------------
         
-def show_options():
+def show_options(username):
     """
     Displays options users can choose in the application, such as
     viewing <x>, filtering results with a flag (e.g. -s to sort),
     sending a request to do <x>, etc.
     """
+    print('\n')
     print('What would you like to do?')
     print('\n')
 
     print('* Add Entities: ')
-    print('  (a) Add a new Beyblade to the database')
+    print('  (a) Add a new Beyblade to the database')  # GOOD
     print('  (b) Add a Beyblade to your account')
     print('  (c) Add a new battle result')
     print('  (d) Add a new user')
     print('\n')
 
     print('* View Beyblade Information: ')
-    print('  (e) View all Beyblades')
-    print('  (f) View Beyblades from a user\'s collection')
-    print('  (g) View parts of a Beyblade')
-    print('  (h) View part information')
+
+    print('  (e) View all Beyblades')   # GOOD
+    print('  (f) View Beyblades from a user\'s collection') # GOOD
+    print('  (g) View parts of a Beyblade') # GOOD
+    print('  (h) View part information')    # GOOD
     print('  (i) View the heaviest Beyblade for a type')
     print('\n')
 
     print('* View Battle Information: ')
-    print('  (j) View all tournament names')
-    print('  (k) View battle results for a tournament')
-    print('  (l) View all battle locations')
-    print('  (m) View battle results for a location')
-    print('  (n) View current users')
-    print('  (o) View battle results for a user')
 
+    print('  (j) View all tournament names')    # TODO
+    print('  (k) View battle results for a tournament')
+    print('  (l) View all battle locations')    # TODO
+    print('  (m) View battle results for a location')
+    print('  (n) View current users')   # GOOD
+    print('  (o) View battle results for a user')   # GOOD
+    print('\n')
+
+    print('* New functions, will add to list above: ')
+
+    print('  (p) Add a Beyblade part to database')  # GOOD
+    print('  (r) View all Beyblade parts in the Database')  # GOOD
+
+    print('\n')
     print('  (q) - quit')
     ans = input('Enter an option: ').lower()
 
     if ans == 'q':
         quit_ui()
     elif ans == 'a':
+        # Adds full Beyblade to database 
+        # Just the parts need to be in the database for the Beyblade being added
+        beyblade_ID = input('Enter Beyblade ID: ')
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
-        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
         is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
+        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
         face_bolt_id = input('Enter Face Bolt ID: ')
         energy_ring_id = input('Enter Energy Ring ID: ')
         fusion_wheel_id = input('Enter Fusion Wheel ID: ')
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
-        add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
-        show_options()
+        add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options(username)
     elif ans == 'b':
         name = input('Enter Beyblade name: ')
         type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
@@ -567,7 +624,7 @@ def show_options():
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
         add_user_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
-        show_options()
+        show_options(username)
     elif ans == 'c':
         tournament_name = input('Enter tournament name: ')
         date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
@@ -579,54 +636,78 @@ def show_options():
         winner_id = input('Enter Winner ID (leave blank if draw): ')
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id)
-        show_options()
+        show_options(username)
     elif ans == 'd':
         username = input('Enter username: ')
         email = input('Enter email: ')
         password = input('Enter password: ')
         is_admin = input('Is the user an admin? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
         add_user(username, email, password, is_admin)
-        show_options()
+        show_options(username)
     elif ans == 'e':
+        # View beyblades table
         view_all_beyblades()
-        show_options()
+        show_options(username)
     elif ans == 'f':
+        # View userbeyblades/collection given username
         user_name = input('Enter username: ')
         view_user_beyblades(user_name)
-        show_options()
+        show_options(username)
     elif ans == 'g':
+        # View part records of individual parts in Beyblade
         beyblade_ID = input('Enter Beyblade ID: ')
         view_beyblade_parts(beyblade_ID)
-        show_options()
+        show_options(username)
     elif ans == 'h':
+        # View part type, weight (g), and description of a part
         part_ID = input('Enter part ID: ')
         view_part_info(part_ID)
-        show_options()
+        show_options(username)
     elif ans == 'i':
         beyblade_type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
         udf_heaviest_beyblade_for_type(beyblade_type)
-        show_options()
+        show_options(username)
     elif ans == 'j':
         # TODO
-        show_options()
+        show_options(username)
     elif ans == 'k':
         tournament_name = input('Enter tournament name: ')
         view_battle_results_for_tournament(tournament_name)
-        show_options()
+        show_options(username)
     elif ans == 'l':
         # TODO
-        show_options()
+        show_options(username)
     elif ans == 'm':
         tournament_location = input('Enter tournament location: ')
         view_battle_results_for_location(tournament_location)
-        show_options()
+        show_options(username)
     elif ans == 'n':
+        # View the users table
         view_users()
-        show_options()
+        show_options(username)
     elif ans == 'o':
+        # View a user's battle results, names, IDs, winners
         username = input('Enter username: ')
         view_all_battle_results_for_user(username)
-        show_options()
+        show_options(username)
+    elif ans == 'p':
+        # Add a record to parts table
+        part_ID = input('Enter Part ID: ')
+        part_type = input('Enter Part Type (Face Bolt, Energy Ring, Fusion Wheel, Spin Track, Performance Tip): ')
+        weight = input('Enter Weight (in grams): ')
+        description = input('Enter Decription: ')
+        try:
+            weight = float(weight)
+        except ValueError:
+            print("Invalid weight. Please enter a numeric value.")
+            show_options()
+            return
+        add_beyblade_part(part_ID, part_type, weight, description)
+        show_options(username)
+    elif ans == 'r':
+        # Shows all records in parts table
+        view_all_beyblade_parts()
+        show_options(username)
 def quit_ui():
     """
     Quits the program, printing a good bye message to the user.

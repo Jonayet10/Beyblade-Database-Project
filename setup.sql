@@ -68,6 +68,7 @@ CREATE TABLE userbeyblades (
     FOREIGN KEY (user_ID) REFERENCES users(user_ID)
         ON DELETE CASCADE, -- if user is deleted in users table, their Beyblades are also deleted from userbeyblades table
     FOREIGN KEY (beyblade_ID) REFERENCES beyblades(beyblade_ID)
+        ON DELETE CASCADE
 );
 
 -- Table for storing battle results
