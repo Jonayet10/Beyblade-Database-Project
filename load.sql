@@ -23,8 +23,8 @@ FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
 LOAD DATA LOCAL INFILE 'beyblades.csv' INTO TABLE beyblades
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
 
--- Load the data for userbeyblades table
-LOAD DATA LOCAL INFILE 'userbeyblades.csv' INTO TABLE userbeyblades
+-- Load the data for beycollection table
+LOAD DATA LOCAL INFILE 'beycollection.csv' INTO TABLE beycollection
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
 
 -- Load the data for battles table

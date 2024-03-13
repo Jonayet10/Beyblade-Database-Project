@@ -2,7 +2,7 @@
 -- checks if the custom Beyblade configuration already exits in the database
 -- based on its parts. If it does not exist, the procedure inserst the new
 -- configuration into the 'beyblades' table. Then it links this Beyblade to
--- the users by inserting a record into the 'userbeyblades' table, associating
+-- the users by inserting a record into the 'beycollection' table, associating
 -- the customized Beyblade with the user's account. Notably, beyblade_ID of
 -- stock Beyblades in 'beyblades' table are already known VARCHAR types, but
 -- we want custom Beyblades in 'beyblades' table to have auto-generated IDs
@@ -52,9 +52,9 @@ BEGIN
     END IF;
 
     -- Link the Beyblade (new or existing) to the user
-    INSERT INTO userbeyblades (user_ID, beyblade_ID)
+    INSERT INTO beycollection (user_ID, beyblade_ID)
     VALUES (_user_id, _beyblade_id);
-    -- Note that user_beyblade_ID attribute of 'userbeyblades' table is auto-incremented INT, so
+    -- Note that user_beyblade_ID attribute of 'beycollection' table is auto-incremented INT, so
     -- don't need to explicitly provide a value for this when inserting
 END !
 

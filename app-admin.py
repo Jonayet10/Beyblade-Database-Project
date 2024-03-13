@@ -126,7 +126,7 @@ def view_user_beyblades(user_name):
     query = """
     SELECT b.beyblade_ID, b.name, b.is_custom
     FROM beyblades b
-    JOIN userbeyblades ub ON b.beyblade_ID = ub.beyblade_ID
+    JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
     JOIN users u ON ub.user_ID = u.user_ID
     WHERE u.username = %s;
     """
@@ -210,9 +210,9 @@ def view_all_battle_results_for_user(user_name):
     FROM battles b
     JOIN users u1 ON b.player1_ID = u1.user_ID
     JOIN users u2 ON b.player2_ID = u2.user_ID
-    JOIN userbeyblades ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
     JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
-    JOIN userbeyblades ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
     JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
     WHERE u1.username = %s OR u2.username = %s;
     """
@@ -251,9 +251,9 @@ def view_battle_results_for_tournament(tournament_name):
     FROM battles b
     JOIN users u1 ON b.player1_ID = u1.user_ID
     JOIN users u2 ON b.player2_ID = u2.user_ID
-    JOIN userbeyblades ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
     JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
-    JOIN userbeyblades ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
     JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
     WHERE b.tournament_name = %s;
     """
@@ -297,9 +297,9 @@ def view_battle_results_for_location(location):
     FROM battles b
     JOIN users u1 ON b.player1_ID = u1.user_ID
     JOIN users u2 ON b.player2_ID = u2.user_ID
-    JOIN userbeyblades ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
     JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
-    JOIN userbeyblades ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
     JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
     WHERE b.location = %s;
     """
@@ -394,7 +394,7 @@ def view_beyblade_parts(beyblade_id):
 def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id, 
                       fusion_wheel_id, spin_track_id, performance_tip_id):
     """
-    Adds the beyblade to the beyblades and userbeyblades table.
+    Adds the beyblade to the beyblades and beycollection table.
 
     Arguments:
         username (str): Username of the user adding the Beyblade.
@@ -546,7 +546,7 @@ def beyblade_leaderboard():
     query = """
     SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(*) as wins
     FROM battles b
-    INNER JOIN userbeyblades ub ON b.winner_ID = ub.user_beyblade_ID
+    INNER JOIN beycollection ub ON b.winner_ID = ub.user_beyblade_ID
     INNER JOIN beyblades bb ON ub.beyblade_ID = bb.beyblade_ID
     GROUP BY bb.beyblade_ID, bb.name, bb.type
     ORDER BY wins DESC, bb.name;
@@ -767,7 +767,7 @@ def show_options(username):
         view_all_beyblades()
         show_options(username)
     elif ans == 'g':
-        # View userbeyblades/collection given username
+        # View beycollection given username
         user_name = input('Enter username: ')
         view_user_beyblades(user_name)
         show_options(username)

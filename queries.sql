@@ -21,9 +21,9 @@ SELECT b.battle_ID, b.date, b.location,
 FROM battles b
 JOIN users u1 ON b.player1_ID = u1.user_ID
 JOIN users u2 ON b.player2_ID = u2.user_ID
-JOIN userbeyblades ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
 JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
-JOIN userbeyblades ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
 JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
 WHERE b.tournament_name = WBBA;
 

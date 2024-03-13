@@ -1,6 +1,6 @@
 -- Remove existing tables to prevent errors on creation
 DROP TABLE IF EXISTS battles;
-DROP TABLE IF EXISTS userbeyblades;
+DROP TABLE IF EXISTS beycollection;
 DROP TABLE IF EXISTS beyblades;
 DROP TABLE IF EXISTS parts;
 DROP TABLE IF EXISTS users;
@@ -58,7 +58,7 @@ CREATE TABLE beyblades (
 );
 
 -- Table for linking users with their Beyblades
-CREATE TABLE userbeyblades (
+CREATE TABLE beycollection (
     -- Unique identifier for user-owned Beyblades
     user_beyblade_ID INT AUTO_INCREMENT PRIMARY KEY,
     -- References the owner of the Beyblade
@@ -66,7 +66,7 @@ CREATE TABLE userbeyblades (
     -- Reference the Beyblade owned by the user
     beyblade_ID VARCHAR(10) NOT NULL,
     FOREIGN KEY (user_ID) REFERENCES users(user_ID)
-        ON DELETE CASCADE, -- if user is deleted in users table, their Beyblades are also deleted from userbeyblades table
+        ON DELETE CASCADE, -- if user is deleted in users table, their Beyblades are also deleted from beycollection table
     FOREIGN KEY (beyblade_ID) REFERENCES beyblades(beyblade_ID)
         ON DELETE CASCADE
 );
@@ -93,10 +93,10 @@ CREATE TABLE battles (
     -- delete player2's battle history if player2's user_ID is deleted in users table
     FOREIGN KEY (player2_ID) REFERENCES users(user_ID)
         ON DELETE CASCADE, 
-    FOREIGN KEY (player1_beyblade_ID) REFERENCES userbeyblades(user_beyblade_ID),
-    FOREIGN KEY (player2_beyblade_ID) REFERENCES userbeyblades(user_beyblade_ID),
-    FOREIGN KEY (winner_ID) REFERENCES userbeyblades(user_beyblade_ID)
+    FOREIGN KEY (player1_beyblade_ID) REFERENCES beycollection(user_beyblade_ID),
+    FOREIGN KEY (player2_beyblade_ID) REFERENCES beycollection(user_beyblade_ID),
+    FOREIGN KEY (winner_ID) REFERENCES beycollection(user_beyblade_ID)
 );
 
-CREATE INDEX idx_userbeyblades_user_id ON userbeyblades(user_ID);
-CREATE INDEX idx_userbeyblades_beyblade_id ON userbeyblades(beyblade_ID);
+CREATE INDEX idx_beycollection_user_id ON beycollection(user_ID);
+CREATE INDEX idx_beycollection_beyblade_id ON beycollection(beyblade_ID);
