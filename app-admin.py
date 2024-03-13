@@ -459,7 +459,7 @@ def heaviest_beyblade_for_type(beyblade_type):
         cursor.execute("SELECT name FROM beyblades WHERE beyblade_id = %s;", (beyblade_id,))
         name_result = cursor.fetchone()
         if name_result and name_result[0]:
-            print(f"The heaviest Beyblade of type '{beyblade_type}' is ID: {beyblade_id}, Name: {name_result[0]}")
+            print(f"\nThe heaviest Beyblade of type '{beyblade_type}' is ID: {beyblade_id}, Name: {name_result[0]}")
         else:
             print(f"No Beyblade found with ID: {beyblade_id}")
     else:
