@@ -88,7 +88,7 @@ JOIN beyblades b ON p.part_ID IN (b.face_bolt_ID, b.energy_ring_ID,
 WHERE b.beyblade_ID = 'BB-70';
 
 -- Gets the ID of the heaviest Beyblade of a specific type. 
-SELECT udf_heaviest_beyblade_for_type('{beyblade_type}') 
+SELECT udf_heaviest_beyblade_for_type('Stamina') 
     AS heaviest_beyblade_id;
 
 -- Gets the name of a Beyblade for a specified Beyblade ID.
