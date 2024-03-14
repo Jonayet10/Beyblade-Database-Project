@@ -91,6 +91,70 @@ def view_all_beyblades():
     cursor.close()
     conn.close()
 
+def view_user_beyblades(user_name):
+    """
+    Queries the database for all Beyblades owned by a specific user and prints
+    their beyblade_ID, name, and custom status in a well-formatted table.
+    
+    Arguments:
+        user_name (str) - The username of the user.
+    Returns: Prints the Beyblade ID, Name, and Custom Status of the user's Beyblades
+    """
+    conn = get_conn() 
+    cursor = conn.cursor()
+
+    query = """
+    SELECT b.beyblade_ID, b.name, b.is_custom
+    FROM beyblades b
+    JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
+    JOIN users u ON ub.user_ID = u.user_ID
+    WHERE u.username = %s;
+    """
+    cursor.execute(query, (user_name,))
+
+    results = cursor.fetchall()
+    headers = ["Beyblade ID", "Name", "Is Custom"]
+
+    if results:
+        # Convert is_custom boolean to a more readable format (Yes/No)
+        formatted_results = [(id, name, "Yes" if is_custom else "No") for id, name, is_custom in results]
+        print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
+    else:
+        print(f"No Beyblades found for user: {user_name}")
+
+    cursor.close()
+    conn.close()
+
+def heaviest_beyblade_for_type(beyblade_type):
+    """
+    Fetches and displays the ID and name of the heaviest Beyblade of a specific type.
+    Arguments:
+        beyblade_type (str): The type of Beyblade (Attack, Defense, Stamina, Balance).
+    """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    # Call the UDF `udf_heaviest_beyblade_for_type` passing the beyblade type
+    query = f"SELECT udf_heaviest_beyblade_for_type('{beyblade_type}') AS heaviest_beyblade_id;"
+    cursor.execute(query)
+
+    # Fetching the result which is the ID of the heaviest beyblade
+    result = cursor.fetchone()
+    if result and result[0]:
+        beyblade_id = result[0]
+        # Fetch beyblade name using the ID
+        cursor.execute("SELECT name FROM beyblades WHERE beyblade_id = %s;", (beyblade_id,))
+        name_result = cursor.fetchone()
+        if name_result and name_result[0]:
+            print(f"\nThe heaviest Beyblade of type '{beyblade_type}' is ID: {beyblade_id}, Name: {name_result[0]}")
+        else:
+            print(f"No Beyblade found with ID: {beyblade_id}")
+    else:
+        print(f"No heaviest Beyblade found for type '{beyblade_type}'.")
+
+    cursor.close()
+    conn.close()
+
 def view_all_battle_results_for_user(user_name):
     """
     Queries the battles table for all battle results related to the 
@@ -123,69 +187,230 @@ def view_all_battle_results_for_user(user_name):
 
     # Fetching all results
     results = cursor.fetchall()
-    headers = ["Battle ID", "Tournament Name", "Date", "Location", 
+    if not results:
+        print("No battles found for user!")
+    else: 
+        headers = ["Battle ID", "Tournament Name", "Date", "Location", 
                "Player 1 Username", "Player 2 Username", 
                "Player 1 Beyblade Name", "Player 2 Beyblade Name", 
                "Player 1 Beyblade ID", "Player 2 BeyBlade ID", "Winner ID"]
     
-    print(tabulate(results, headers=headers, tablefmt="grid"))
+        print(tabulate(results, headers=headers, tablefmt="grid"))
+
     # Closing cursor and connection
     cursor.close()
     conn.close()
 
+def view_all_tournament_names():
+    """
+    Retrieves and prints unique tournament names from the 'battles' table. If no tournaments exist, 
+    indicates no tournaments found.
+    """
+    conn = get_conn()  
+    cursor = conn.cursor()
+
+    # SQL query to select distinct tournament names
+    sql = "SELECT DISTINCT tournament_name FROM battles ORDER BY tournament_name;"
+
+    try:
+        cursor.execute(sql)
+        tournaments = cursor.fetchall()  # Fetch all results
+
+        if tournaments:
+            print("\nList of Tournament Names:")
+            for tournament in tournaments:
+                print(tournament[0])  # Print each tournament name
+        else:
+            print("No tournaments found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  
+
+def view_all_battle_locations():
+    """
+    Fetches and displays unique battle locations from the 'battles' table.
+    """
+    conn = get_conn()  # Way to get database connection
+    cursor = conn.cursor()
+
+    # SQL query to select distinct battle locations
+    sql = "SELECT DISTINCT location FROM battles ORDER BY location;"
+
+    try:
+        cursor.execute(sql)
+        locations = cursor.fetchall()  # Fetch all results
+
+        if locations:
+            print("\nList of Battle Locations:")
+            for location in locations:
+                print(location[0])  # Print each location
+        else:
+            print("No battle locations found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  # Closing the connection when done
+
+def beyblade_leaderboard():
+    """
+    Prints a leaderboard of Beyblades based on their wins in battles.
+    """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(*) as wins
+    FROM battles b
+    INNER JOIN beycollection ub ON b.winner_ID = ub.user_beyblade_ID
+    INNER JOIN beyblades bb ON ub.beyblade_ID = bb.beyblade_ID
+    GROUP BY bb.beyblade_ID, bb.name, bb.type
+    ORDER BY wins DESC, bb.name;
+    """
+    try:
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if results:
+            print("\nBeyblade Leaderboard (Most Wins):")
+            headers = ['Beyblade ID', 'Name', 'Type', 'Wins']
+            print(tabulate(results, headers=headers, tablefmt="grid"))
+        else:
+            print("No battle results found.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
+
 def view_battle_results_for_tournament(tournament_name):
     """
-    Queries the battles table for all battle results related to the 
-    specified tournament. 
-
+    Queries the battles table for all battle results related to the specified tournament.
+    
     Arguments:
-        tournament_name (str) - the name of the tournament.  
+        tournament_name (str) - the name of the tournament.
 
-    Return value: Query of the battles table. 
+    Return value: None. Prints the query result of the battles table in a formatted table.
     """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    # SQL query to fetch battle results for the given tournament name
+    query = """
+    SELECT b.battle_ID, b.date, b.location, 
+           u1.username AS Player1_Username, u2.username AS Player2_Username, 
+           bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
+           b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
+    FROM battles b
+    JOIN users u1 ON b.player1_ID = u1.user_ID
+    JOIN users u2 ON b.player2_ID = u2.user_ID
+    JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
+    JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
+    WHERE b.tournament_name = %s;
+    """
+    cursor.execute(query, (tournament_name,))
+
+    # Fetching all results
+    results = cursor.fetchall()
+    headers = ["Battle ID", "Date", "Location", 
+               "Player 1 Username", "Player 2 Username", 
+               "Player 1 Beyblade Name", "Player 2 Beyblade Name", 
+               "Player 1 Beyblade ID", "Player 2 BeyBlade ID", "Winner ID"]
+    
+    # Check if there are any results
+    if results:
+        print(tabulate(results, headers=headers, tablefmt="grid"))
+    else:
+        print(f"No battles found for tournament: {tournament_name}")
+
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
 
 def view_battle_results_for_location(location):
     """
-    Queries the battles table for all battle results related to the 
-    specified location. 
-
+    Queries the battles table for all battle results related to the specified location.
+    
     Arguments:
-        location (str) - the specified location.
+        location (str) - the specified location of the battles to query.
 
-    Return value: Query of the battles table.
+    Return value: None. Prints the query result of the battles table in a formatted table.
     """
+    conn = get_conn()
+    cursor = conn.cursor()
 
-def view_beyblade_info(name):
+    # SQL query to fetch battle results for the given location
+    query = """
+    SELECT b.battle_ID, b.tournament_name, b.date, 
+           u1.username AS Player1_Username, u2.username AS Player2_Username, 
+           bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
+           b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
+    FROM battles b
+    JOIN users u1 ON b.player1_ID = u1.user_ID
+    JOIN users u2 ON b.player2_ID = u2.user_ID
+    JOIN beycollection ub1 ON b.player1_beyblade_ID = ub1.user_beyblade_ID
+    JOIN beyblades bb1 ON ub1.beyblade_ID = bb1.beyblade_ID
+    JOIN beycollection ub2 ON b.player2_beyblade_ID = ub2.user_beyblade_ID
+    JOIN beyblades bb2 ON ub2.beyblade_ID = bb2.beyblade_ID
+    WHERE b.location = %s;
     """
-    Queries the beyblades table for the information of all beyblades with that
-    particular name.
+    cursor.execute(query, (location,))
 
+    # Fetching all results
+    results = cursor.fetchall()
+    headers = ["Battle ID", "Tournament Name", "Date", 
+               "Player 1 Username", "Player 2 Username", 
+               "Player 1 Beyblade Name", "Player 2 Beyblade Name", 
+               "Player 1 Beyblade ID", "Player 2 BeyBlade ID", "Winner ID"]
+    
+    # Check if there are any results
+    if results:
+        print(tabulate(results, headers=headers, tablefmt="grid"))
+    else:
+        print(f"No battles found for location: {location}")
+
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
+
+def view_part_info(part_id):
+    """
+    Queries the parts table for information about a specific part given its part_ID.
+    
     Arguments:
-        name (str) - the specified beyblade name.
+        part_id (str) - the unique identifier for the part to query.
 
-    Return value: Query of the beyblades table. 
+    Return value: None. Prints the query result of the part in a formatted table.
     """
+    conn = get_conn()
+    cursor = conn.cursor()
 
-def view_part_info(part_name):
+    # SQL query to fetch information for the given part_ID
+    query = """
+    SELECT part_ID, part_type, weight, description
+    FROM parts
+    WHERE part_ID = %s;
     """
-    Queries the parts table for the information of the specified part name.
+    cursor.execute(query, (part_id,))
 
-    Arguments:
-        part_name (str) - the specified part name.
+    # Fetching the result
+    result = cursor.fetchone()
+    
+    headers = ["Part ID", "Part Type", "Weight", "Description"]
+    
+    # Check if there is a result
+    if result:
+        print(tabulate([result], headers=headers, tablefmt="grid"))
+    else:
+        print(f"No information found for part ID: {part_id}")
 
-    Return value: Query of the parts table. 
-    """
-
-def view_user_beyblades(user_name):
-    """
-    Queries the beycollection table for the beyblades of the specified user 
-    name.
-
-    Arguments:
-        user_name (str) - the specified user name.
-
-    Return value: Query of the beycollection table.  
-    """
+    # Closing cursor and connection
+    cursor.close()
+    conn.close()
 
 def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, 
                  fusion_wheel_id, spin_track_id, performance_tip_id):
@@ -193,7 +418,16 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
     Adds the beyblade to the beyblades and beycollection table.
 
     Arguments:
-        name (str) ... (so on.) TODO
+        name (str): The name of the Beyblade.
+        type (str): The type category of the Beyblade 
+            (e.g., Attack, Defense, Stamina, Balance).
+        series (str): The series the Beyblade belongs to.
+        is_custom (bool): Indicates whether the Beyblade is custom.
+        face_bolt_id (int): The ID of the face bolt.
+        energy_ring_id (int): The ID of the energy ring.
+        fusion_wheel_id (int): The ID of the fusion wheel.
+        spin_track_id (int): The ID of the spin track.
+        performance_tip_id (int): The ID of the performance tip.
     
     Return value: none.
     """
@@ -209,6 +443,65 @@ def add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id,
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+def view_all_beyblade_parts():
+    """
+    Retrieves and displays all Beyblade parts from the database, sorted 
+    by part type and part ID.
+    """
+    conn = get_conn()  
+    cursor = conn.cursor()
+    
+    # SQL query to select all parts
+    sql = "SELECT part_ID, part_type, weight, description FROM parts ORDER BY part_type, part_ID;"
+    
+    try:
+        cursor.execute(sql)
+        parts = cursor.fetchall()  # Fetch all results
+        
+        if parts:
+            # Printing the results in a table format
+            print("\nBeyblade Parts List:")
+            print(tabulate(parts, headers=['Part ID', 'Part Type', 'Weight (g)', 'Description'], tablefmt="grid"))
+        else:
+            print("No parts found in the database.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()  
+
+def view_beyblade_parts(beyblade_id):
+    """
+    Queries the database for the names and weights of all parts that make up a specific
+    Beyblade and prints them in a well-formatted table.
+    
+    Arguments:
+        beyblade_id (str) - The ID of the Beyblade.
+    Returns: Prints the PART ID, Part Type, Part Description, and Weight in a formatted table.
+    """
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT p.part_ID, p.part_type, p.weight, p.description
+    FROM parts p
+    JOIN beyblades b ON p.part_ID IN (b.face_bolt_ID, b.energy_ring_ID, 
+                                      b.fusion_wheel_ID, b.spin_track_ID, 
+                                      b.performance_tip_ID)
+    WHERE b.beyblade_ID = %s;
+    """
+    cursor.execute(query, (beyblade_id,))
+
+    results = cursor.fetchall()
+    headers = ["Part ID", "Part Type", "Weight (g)", "Description"]
+
+    if results:
+        print(tabulate(results, headers=headers, tablefmt="grid"))
+    else:
+        print(f"No parts found for Beyblade ID: {beyblade_id}")
+
+    cursor.close()
+    conn.close()
 
 # ----------------------------------------------------------------------
 # Functions for Logging Users In
@@ -282,10 +575,10 @@ def add_user(username, email, password, is_admin):
     Adds the user to the users and user_info table.
 
     Arguments:
-        username (str) - TODO
-        email (str) - TODO
-        password (str) - TODO
-        is_client (bool) - TODO
+        username (str) - The username of the new user.
+        email (str) - The email address of the new user.
+        password (str) - The password for the new user. 
+        is_client (bool) - Always 0, since this is client.
     
     Return value: none.
     """
@@ -304,6 +597,55 @@ def add_user(username, email, password, is_admin):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+def add_user_beyblade(username, name, type, series, face_bolt_id, 
+                      energy_ring_id, fusion_wheel_id, spin_track_id, 
+                      performance_tip_id):
+    """
+    Adds the beyblade to the beyblades and beycollection table.
+
+    Arguments:
+        username (str): Username of the user adding the Beyblade.
+        name (str): Name of the Beyblade.
+        type (str): Type of the Beyblade (Attack, Defense, Stamina, Balance).
+        series (str): Series the Beyblade belongs to 
+            (Metal Fusion, Metal Masters, Metal Fury).
+        face_bolt_id (str): ID of the Face Bolt part.
+        energy_ring_id (str): ID of the Energy Ring part.
+        fusion_wheel_id (str): ID of the Fusion Wheel part.
+        spin_track_id (str): ID of the Spin Track part.
+        performance_tip_id (str): ID of the Performance Tip part.
+    
+    Return value: none.
+    """
+    cursor = conn.cursor()
+
+    # SQL query to fetch user_id based on username
+    sql_get_user_id = "SELECT user_ID FROM users WHERE username = %s;"
+    try:
+        cursor.execute(sql_get_user_id, (username,))
+        user_id_row = cursor.fetchone()
+        if user_id_row is not None:
+            user_id = user_id_row[0]
+        else:
+            print(f"Error: User '{username}' not found.")
+            return
+    except mysql.connector.Error as err:
+        print(f"Error fetching user ID: {err}")
+        return
+
+    # Now, call the stored procedure with the obtained user_id
+    sql_call_sp = "CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    data = (user_id, name, type, series, face_bolt_id, energy_ring_id, 
+            fusion_wheel_id, spin_track_id, performance_tip_id)
+    try:
+        cursor.execute(sql_call_sp, data)
+        conn.commit()
+        print(f"Added new Beyblade: {name} for user {username}")
+    except mysql.connector.Error as err:
+        print(f"Error adding Beyblade: {err}")
+    finally:
+        cursor.close()
+        
 # ----------------------------------------------------------------------
 # Command-Line Functionality
 # ----------------------------------------------------------------------
@@ -313,76 +655,117 @@ def show_options(username):
     viewing <x>, filtering results with a flag (e.g. -s to sort),
     sending a request to do <x>, etc.
     """
-    print('What would you like to do? ')
-    # Add more options as needed
-    print('  (a) - View all Beyblades')
-    print('  (b) - View your battle results')
-    print('  (c) - View battle results for a tournament')
-    print('  (d) - View battle results for location')
-    print('  (e) - View information about a Beyblade.')
-    print('  (f) - View information about a part.')
-    print('  (g) - View your Beyblades.')
-    print('  (h) - Add a Beyblade.')
-    print('  (i) - Add a user.')
-    print('  (q) - quit')
+    print('\n')
+    print('What would you like to do?')
+    print('\n')
+
+    print('  (a) Create an account') # DONE
+    print('  (b) Add a Beyblade to your collection') # DONE
+    print('\n')
+
+    print('* View Beyblade Information: ')
+    print('  (c) View all Beyblades')  # DONE
+    print('  (d) View your Beyblades.') # DONE 
+    print('  (e) View the heaviest Beyblade for a type') # DONE
+    print('\n')
+
+    print('* View Beyblade Part Information: ')
+    print('  (f) View information about a part') # DONE
+    print('  (h) View all parts in the database')
+    print('  (i) View parts of a Beyblade')
+    print('\n')
+
+    print('* View Battle Information: ')    
+    print('  (j) View all tournament names')   
+    print('  (k) View all battle locations') 
+    print('  (l) View your battle results')
+    print('  (m) View battle results for a tournament')
+    print('  (n) View battle results for location')
+    print('  (o) View Beyblade Battles leaderboard')
+    print('\n')
+
+    print('  (q) quit')
     print()
     ans = input('Enter an option: ').lower()
 
     if ans == 'q':
         quit_ui()
     elif ans == 'a':
+        print("CREATING A NEW ACCOUNT.")
+        new_username = input('Enter username: ')
+        email = input('Enter email: ')
+        password = input('Enter password: ')
+        add_user(new_username, email, password, 0)
+        show_options(username)
+    elif ans == 'b':
+        print("ADDING A BEYBLADE TO YOUR ACCCOUNT.")
+        name = input('Enter Beyblade name: ')
+        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
+        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
+        face_bolt_id = input('Enter Face Bolt ID: ')
+        energy_ring_id = input('Enter Energy Ring ID: ')
+        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
+        spin_track_id = input('Enter Spin Track ID: ')
+        performance_tip_id = input('Enter Performance Tip ID: ')
+        add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        show_options(username)
+    elif ans == 'c':
         print("VIEWING ALL BEYBLADES.")
         view_all_beyblades()
         show_options(username)
-    elif ans == 'b':
-        print("VIEWING ALL BATTLE RESULTS FOR USER.")
-        view_all_battle_results_for_user(username)
-        show_options(username)
-    elif ans == 'c':
-        print("VIEWING ALL BATTLE RESULTS FOR TOURNAMENT.")
-        tournament = input('Tournament name: ')
-        view_battle_results_for_tournament(tournament)
-        show_options(username)
     elif ans == 'd':
-        print("VIEWING ALL BATTLE RESULTS FOR LOCATION.")
-        # view_battle_results_for_location()
+        print("VIEWING YOUR BEYBLADES.")
+        view_user_beyblades(username)
         show_options(username)
     elif ans == 'e':
-        print("VIEWING INFORMATION ABOUT A BEYBLADE.")
-        # view_beyblade_info()
+        print("VIEWING THE HEAVIEST BEYBLADE FOR A TYPE.")
+        beyblade_type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
+        heaviest_beyblade_for_type(beyblade_type)
         show_options(username)
     elif ans == 'f':
         print("VIEWING INFORMATION ABOUT A PART.")
-        # view_part_info()
+        part_ID = input('Enter part ID: ')
+        view_part_info(part_ID)
         show_options(username)
     elif ans == 'g':
         print("VIEWING ALL USER BEYBLADES.")
         # view_user_beyblades()
         show_options(username)
     elif ans == 'h':
-        # Prompt for Beyblade details and call add_beyblade function
-        # TODO: Fix style here, keep it under 80 chars per line. 
-        name = input('Enter Beyblade name: ')
-        type = input('Enter Beyblade type (Attack, Defense, Stamina, Balance): ')
-        series = input('Enter Beyblade series (Metal Fusion, Metal Masters, Metal Fury): ')
-        is_custom = input('Is it custom? (True/False): ').lower() in ['true', '1', 't', 'y', 'yes']
-        face_bolt_id = input('Enter Face Bolt ID: ')
-        energy_ring_id = input('Enter Energy Ring ID: ')
-        fusion_wheel_id = input('Enter Fusion Wheel ID: ')
-        spin_track_id = input('Enter Spin Track ID: ')
-        performance_tip_id = input('Enter Performance Tip ID: ')
-        add_beyblade(name, type, series, is_custom, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+        print("VIEWING ALL BEYBLADE PARTS.")
+        view_all_beyblade_parts()
         show_options(username)
     elif ans == 'i':
-        # Prompt for user details and call a function to add the user
-        # TODO: Fix style here, keep it under 80 chars per line. 
-        username = input('Enter username: ')
-        email = input('Enter email: ')
-        password = input('Enter password: ')
-        user_input = input('Is the user an admin? (True/False): ').lower()
-        is_client = user_input not in ['true', '1', 't', 'y', 'yes']
-
-        add_user(username, email, password, 0)
+        print("VIEWING ALL PARTS FOR A BEYBLADE.")
+        beyblade_ID = input('Enter Beyblade ID: ')
+        view_beyblade_parts(beyblade_ID)
+        show_options(username)
+    elif ans == 'j':
+        print("VIEWING ALL TOURNAMENT NAMES.")
+        view_all_tournament_names()
+        show_options(username)
+    elif ans == 'k':
+        print("VIEWING ALL TOURNAMENT LOCATIONS.")
+        view_all_battle_locations()
+        show_options(username)
+    elif ans == 'l':
+        print("VIEWING BATTLE RESULTS FOR USER.")
+        view_all_battle_results_for_user(username)
+        show_options(username)
+    elif ans == 'm':
+        print("VIEWING RESULTS FOR TOURNAMENT.")
+        tournament_name = input('Enter tournament name: ')
+        view_battle_results_for_tournament(tournament_name)
+        show_options(username)
+    elif ans == 'n':
+        print("VIEWING BATTLE RESULTS FOR LOCATION.")
+        tournament_location = input('Enter tournament location: ')
+        view_battle_results_for_location(tournament_location)
+        show_options(username)
+    elif ans == 'o': 
+        print("VIEWING BEYBLADE BATTLE LEADERBOARD.")
+        beyblade_leaderboard()
+        show_options(username)
     elif ans == 'q':
         quit_ui()
 

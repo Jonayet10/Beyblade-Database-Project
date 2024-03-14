@@ -50,4 +50,11 @@ GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'midoriyai'@'localhost';
 GRANT SELECT ON beybladedb.battles TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.battles TO 'midoriyai'@'localhost';
 
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_user TO 'gokus'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_user TO 'midoriyai'@'localhost';
+GRANT INSERT ON beybladedb.users TO 'gokus'@'localhost';
+GRANT INSERT ON beybladedb.users TO 'midoriyai'@'localhost';
+
+GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type TO 'gokus'@'localhost';
+GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type TO 'midoriyai'@'localhost';
 FLUSH PRIVILEGES;
