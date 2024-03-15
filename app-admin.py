@@ -62,7 +62,26 @@ def get_conn():
 # Functions for Command-Line Options/Query Execution
 # ----------------------------------------------------------------------
 
-def add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID):
+def add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_ID, 
+                 energy_ring_ID, fusion_wheel_ID, spin_track_ID, 
+                 performance_tip_ID):
+    """
+    Adds the beyblade to the beyblades and beycollection table.
+
+    Arguments:
+        name (str): The name of the Beyblade.
+        type (str): The type category of the Beyblade 
+            (e.g., Attack, Defense, Stamina, Balance).
+        series (str): The series the Beyblade belongs to.
+        is_custom (bool): Indicates whether the Beyblade is custom.
+        face_bolt_id (int): The ID of the face bolt.
+        energy_ring_id (int): The ID of the energy ring.
+        fusion_wheel_id (int): The ID of the fusion wheel.
+        spin_track_id (int): The ID of the spin track.
+        performance_tip_id (int): The ID of the performance tip.
+    
+    Return value: none.
+    """
     cursor = conn.cursor()
     # Corrected SQL INSERT statement with accurate column names
     sql = ("INSERT INTO beyblades (beyblade_ID, name, type, is_custom, series, face_bolt_ID, energy_ring_ID, fusion_wheel_ID, spin_track_ID, performance_tip_ID) "
@@ -77,10 +96,29 @@ def add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_ID, energ
         print(f"Error: {err}")
 
 
-def add_battle(tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id):
+def add_battle(tournament_name, date, location, player1_id, player2_id, 
+               player1_beyblade_id, player2_beyblade_id, winner_id):
+    """
+    Records a new battle result in the database.
+
+    Arguments:
+        tournament_name (str): Name of the tournament.
+        date (str or datetime): Date when the battle occurred.
+        location (str): Location of the battle.
+        player1_id (int): User ID of the first player.
+        player2_id (int): User ID of the second player.
+        player1_beyblade_id (int): ID of the Beyblade used by the 1st player.
+        player2_beyblade_id (int): ID of the Beyblade used by the 2nd player.
+        winner_id (int): User ID of the winner.
+
+    Return value: None..
+    """
     cursor = conn.cursor()
     try:
-        cursor.callproc('sp_record_battle', (tournament_name, date, location, player1_id, player2_id, player1_beyblade_id, player2_beyblade_id, winner_id))
+        cursor.callproc('sp_record_battle', (tournament_name, date, location, 
+                                             player1_id, player2_id, 
+                                             player1_beyblade_id, 
+                                             player2_beyblade_id, winner_id))
         conn.commit()
         print("New battle result added successfully.")
     except mysql.connector.Error as err:
@@ -146,6 +184,19 @@ def view_user_beyblades(user_name):
     conn.close()
 
 def add_beyblade_part(part_ID, part_type, weight, description):
+    """
+    Adds a new Beyblade part to the database.
+
+    Arguments:
+        part_ID (int): The unique identifier for the Beyblade part.
+        part_type (str): The type of the Beyblade part 
+            (e.g., Face Bolt, Energy Ring, Fusion Wheel).
+        weight (float): The weight of the part in grams.
+        description (str): A brief description of the part.
+
+    Return value: None. 
+    """
+
     cursor = conn.cursor()
     # SQL INSERT statement for the parts table
     sql = ("INSERT INTO parts (part_ID, part_type, weight, description) "
@@ -161,7 +212,9 @@ def add_beyblade_part(part_ID, part_type, weight, description):
         print(f"Error: {err}")
     finally:
         cursor.close()
+
 # -------------------------------------------- Functions that also the client has ---------------------------------------------------
+        
 def view_all_beyblades():
     """
     Queries the beyblades table for 
@@ -220,7 +273,10 @@ def view_all_battle_results_for_user(user_name):
 
     # Fetching all results
     results = cursor.fetchall()
-    headers = ["Battle ID", "Tournament Name", "Date", "Location", 
+    if not results:
+        print("No battles found for user!")
+    else: 
+        headers = ["Battle ID", "Tournament Name", "Date", "Location", 
                "Player 1 Username", "Player 2 Username", 
                "Player 1 Beyblade Name", "Player 2 Beyblade Name", 
                "Player 1 Beyblade ID", "Player 2 BeyBlade ID", "Winner ID"]
@@ -359,12 +415,12 @@ def view_part_info(part_id):
 
 def view_beyblade_parts(beyblade_id):
     """
-    Queries the database for the names and weights of all parts that make up a specific
-    Beyblade and prints them in a well-formatted table.
+    Queries the database for the names and weights of all parts that make up 
+    a specific Beyblade and prints them in a well-formatted table.
     
     Arguments:
         beyblade_id (str) - The ID of the Beyblade.
-    Returns: Prints the PART ID, Part Type, Part Description, and Weight in a formatted table.
+    Returns: Prints the PART ID, Part Type, Part Description, and Weight.
     """
     conn = get_conn()
     cursor = conn.cursor()
@@ -399,8 +455,10 @@ def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id
     Arguments:
         username (str): Username of the user adding the Beyblade.
         name (str): Name of the Beyblade.
-        type (str): Type of the Beyblade (Attack, Defense, Stamina, Balance).
-        series (str): Series the Beyblade belongs to (Metal Fusion, Metal Masters, Metal Fury).
+        type (str): Type of the Beyblade 
+            (Attack, Defense, Stamina, Balance).
+        series (str): Series the Beyblade belongs to 
+            (Metal Fusion, Metal Masters, Metal Fury).
         face_bolt_id (str): ID of the Face Bolt part.
         energy_ring_id (str): ID of the Energy Ring part.
         fusion_wheel_id (str): ID of the Fusion Wheel part.
@@ -427,7 +485,8 @@ def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id
 
     # Now, call the stored procedure with the obtained user_id
     sql_call_sp = "CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    data = (user_id, name, type, series, face_bolt_id, energy_ring_id, fusion_wheel_id, spin_track_id, performance_tip_id)
+    data = (user_id, name, type, series, face_bolt_id, energy_ring_id, 
+            fusion_wheel_id, spin_track_id, performance_tip_id)
     try:
         cursor.execute(sql_call_sp, data)
         conn.commit()
@@ -440,9 +499,11 @@ def add_user_beyblade(username, name, type, series, face_bolt_id, energy_ring_id
 
 def heaviest_beyblade_for_type(beyblade_type):
     """
-    Fetches and displays the ID and name of the heaviest Beyblade of a specific type.
+    Fetches and displays the ID and name of the heaviest Beyblade of a specific
+    type.
     Arguments:
-        beyblade_type (str): The type of Beyblade (Attack, Defense, Stamina, Balance).
+        beyblade_type (str): The type of Beyblade 
+        (Attack, Defense, Stamina, Balance).
     """
     conn = get_conn()
     cursor = conn.cursor()
@@ -469,6 +530,10 @@ def heaviest_beyblade_for_type(beyblade_type):
     conn.close()
 
 def view_all_beyblade_parts():
+    """
+    Retrieves and displays all Beyblade parts from the database, sorted 
+    by part type and part ID.
+    """
     conn = get_conn()  
     cursor = conn.cursor()
     
@@ -492,6 +557,10 @@ def view_all_beyblade_parts():
         conn.close()  
 
 def view_all_tournament_names():
+    """
+    Retrieves and prints unique tournament names from the 'battles' table. 
+    If no tournaments exist, indicates no tournaments found.
+    """
     conn = get_conn()  
     cursor = conn.cursor()
 
@@ -515,6 +584,9 @@ def view_all_tournament_names():
         conn.close()  
 
 def view_all_battle_locations():
+    """
+    Fetches and displays unique battle locations from the 'battles' table.
+    """
     conn = get_conn()  # Way to get database connection
     cursor = conn.cursor()
 
@@ -536,6 +608,7 @@ def view_all_battle_locations():
     finally:
         cursor.close()
         conn.close()  # Closing the connection when done
+
 def beyblade_leaderboard():
     """
     Prints a leaderboard of Beyblades based on their wins in battles.
@@ -637,6 +710,17 @@ def login():
 
 # Add user to 'user_info' and 'users' tables
 def add_user(username, email, password, is_admin):
+    """
+    Adds the user to the users and user_info table.
+
+    Arguments:
+        username (str) - The username of the new user.
+        email (str) - The email address of the new user.
+        password (str) - The password for the new user. 
+        is_client (bool) - Boolean indicating whether new user is admin or not.
+    
+    Return value: none.
+    """
     cursor = conn.cursor()
     sql_user_info = "CALL sp_add_user(%s, %s, %s)"  # Call the stored procedure to add user to user_info table
     sql_users = "INSERT INTO users (username, email, is_admin) VALUES (%s, %s, %s)"  # Add user to users table
@@ -649,7 +733,6 @@ def add_user(username, email, password, is_admin):
         print(f"User '{username}' added successfully.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
-
 
 # ----------------------------------------------------------------------
 # Command-Line Functionality
