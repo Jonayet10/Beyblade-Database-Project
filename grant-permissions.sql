@@ -34,16 +34,20 @@ GRANT SELECT ON beybladedb.beycollection TO 'midoriyai'@'localhost';
 GRANT SELECT ON beybladedb.users TO 'gokus'@'localhost';
 GRANT SELECT ON beybladedb.users TO 'midoriyai'@'localhost';
 
--- Grant INSERT, UPDATE, and DELETE permissions on beycollection table to Bladers
-GRANT INSERT, UPDATE, DELETE ON beybladedb.beycollection TO 'gokus'@'localhost';
-GRANT INSERT, UPDATE, DELETE ON beybladedb.beycollection TO 'midoriyai'@'localhost';
+-- Grant INSERT, UPDATE, and DELETE permissions on beycollection table to 
+-- Bladers
+GRANT INSERT, UPDATE, DELETE ON beybladedb.beycollection 
+    TO 'gokus'@'localhost';
+GRANT INSERT, UPDATE, DELETE ON beybladedb.beycollection 
+    TO 'midoriyai'@'localhost';
 
 -- Grant EXECUTE permission on the sp_add_beyblade procedure to Bladers
 -- This allows Bladers to perform actions encapsulated by the procedure, even
 -- if they don't have direct permissions to perform those actions on the
 -- underlying tables ('beyblades' table)
 GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'gokus'@'localhost';
-GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade TO 'midoriyai'@'localhost';
+GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_beyblade 
+    TO 'midoriyai'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'gokus'@'localhost';
 GRANT EXECUTE ON FUNCTION beybladedb.authenticate TO 'midoriyai'@'localhost';
 
@@ -56,7 +60,9 @@ GRANT EXECUTE ON PROCEDURE beybladedb.sp_add_user TO 'midoriyai'@'localhost';
 GRANT INSERT ON beybladedb.users TO 'gokus'@'localhost';
 GRANT INSERT ON beybladedb.users TO 'midoriyai'@'localhost';
 
-GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type TO 'gokus'@'localhost';
-GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type TO 'midoriyai'@'localhost';
+GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type 
+    TO 'gokus'@'localhost';
+GRANT EXECUTE ON FUNCTION beybladedb.udf_heaviest_beyblade_for_type 
+    TO 'midoriyai'@'localhost';
 
 FLUSH PRIVILEGES;

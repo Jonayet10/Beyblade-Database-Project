@@ -25,7 +25,8 @@ CREATE TABLE parts (
     -- Unique identifier for each part
     part_ID VARCHAR(20) PRIMARY KEY,
     -- Type of the part 
-    part_type ENUM('Face Bolt', 'Energy Ring', 'Fusion Wheel', 'Spin Track', 'Performance Tip') NOT NULL,
+    part_type ENUM('Face Bolt', 'Energy Ring', 'Fusion Wheel', 'Spin Track', 
+        'Performance Tip') NOT NULL,
     -- Weight of the part in grams
     weight DECIMAL(4,2) NOT NULL,
     -- Brief description of the part
@@ -66,7 +67,8 @@ CREATE TABLE beycollection (
     -- Reference the Beyblade owned by the user
     beyblade_ID VARCHAR(10) NOT NULL,
     FOREIGN KEY (user_ID) REFERENCES users(user_ID)
-        ON DELETE CASCADE, -- if user is deleted in users table, their Beyblades are also deleted from beycollection table
+        ON DELETE CASCADE, -- if user is deleted in users table, their 
+        -- Beyblades are also deleted from beycollection table
     FOREIGN KEY (beyblade_ID) REFERENCES beyblades(beyblade_ID)
         ON DELETE CASCADE
 );
@@ -87,14 +89,18 @@ CREATE TABLE battles (
     player1_beyblade_ID INT NOT NULL,
     player2_beyblade_ID INT NOT NULL,
     winner_ID INT, -- Can be NULL if battle was draw
-    -- delete player1's battle history if player1's user_ID is deleted in users table
+    -- delete player1's battle history if player1's user_ID is deleted in users 
+    -- table
     FOREIGN KEY (player1_ID) REFERENCES users(user_ID)
         ON DELETE CASCADE, 
-    -- delete player2's battle history if player2's user_ID is deleted in users table
+    -- delete player2's battle history if player2's user_ID is deleted in users 
+    -- table
     FOREIGN KEY (player2_ID) REFERENCES users(user_ID)
         ON DELETE CASCADE, 
-    FOREIGN KEY (player1_beyblade_ID) REFERENCES beycollection(user_beyblade_ID),
-    FOREIGN KEY (player2_beyblade_ID) REFERENCES beycollection(user_beyblade_ID),
+    FOREIGN KEY (player1_beyblade_ID) REFERENCES 
+        beycollection(user_beyblade_ID),
+    FOREIGN KEY (player2_beyblade_ID) REFERENCES 
+        beycollection(user_beyblade_ID),
     FOREIGN KEY (winner_ID) REFERENCES beycollection(user_beyblade_ID)
 );
 
