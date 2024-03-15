@@ -34,3 +34,21 @@ mysql> SOURCE queries.sql;
 
 # Instructions for Running Python Program
 
+Quit out of MySQL CLI:
+
+mysql> quit
+
+If you are a client, run
+
+$ python app-client.py
+
+If you are an admin, run
+
+$ python app-admin.py
+
+The registered admins are:
+
+| USER       | PASSWORD      |
+|------------|---------------|
+| jlavin     | jlavinpw      |
+| alinazhang | alinazhangpw  |
