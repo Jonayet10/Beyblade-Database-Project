@@ -246,7 +246,7 @@ def add_beyblade_part(part_ID, part_type, weight, description):
     finally:
         cursor.close()
 
-# -------------------------------------------- Functions that also the cli
+# ------------ Functions that also the client has ----------------
 
 
 def view_all_beyblades():

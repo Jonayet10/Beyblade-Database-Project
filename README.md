@@ -14,6 +14,8 @@ and enter your password accordingly, assuming root is the username being used to
 
 Create and use database in the MySQL command-line interface:
 
+    mysql> SET GLOBAL local_infile = TRUE;
+
     mysql> CREATE DATABASE beybladedb;
 
     mysql> USE beybladedb;
