@@ -122,7 +122,8 @@ ORDER BY wins DESC, bb.name;
 -- RA SPECIFIC QUERY - though this is used in app-admin:
 -- Inserts a new part into the parts table. 
 INSERT INTO parts (part_ID, part_type, weight, description) 
-    VALUES ('777', 'Spin Track', '77', 'Lucky Part!'); 
+    VALUES ('BD145', 'Spin Track', 8, 'This particular spin track is designed 
+    for stamina Type Beyblades, enhancing their endurance in battles'); 
 
 -- setup queries:
 -- Used to select a beyblade based off which parts it has that we specify. 
