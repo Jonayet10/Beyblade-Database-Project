@@ -94,17 +94,17 @@ def view_all_beyblades():
 def view_user_beyblades(user_name):
     """
     Queries the database for all Beyblades owned by a specific user and prints
-    their beyblade_ID, name, and custom status in a well-formatted table.
+    their beyblade_ID, name, custom status, and Beyblade-Player ID in a well-formatted table.
     
     Arguments:
         user_name (str) - The username of the user.
-    Returns: Prints the Beyblade ID, Name, and Custom Status of the user's Beyblades
+    Returns: Prints the Beyblade ID, Name, Custom Status, and Beyblade-Player ID of the user's Beyblades
     """
     conn = get_conn() 
     cursor = conn.cursor()
 
     query = """
-    SELECT b.beyblade_ID, b.name, b.is_custom
+    SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom
     FROM beyblades b
     JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
     JOIN users u ON ub.user_ID = u.user_ID
@@ -113,11 +113,12 @@ def view_user_beyblades(user_name):
     cursor.execute(query, (user_name,))
 
     results = cursor.fetchall()
-    headers = ["Beyblade ID", "Name", "Is Custom"]
+    headers = ["Beyblade-Player ID", "Beyblade ID", "Name", "Is Custom"]
 
     if results:
         # Convert is_custom boolean to a more readable format (Yes/No)
-        formatted_results = [(id, name, "Yes" if is_custom else "No") for id, name, is_custom in results]
+        formatted_results = [(user_beyblade_id, id, name, "Yes" if is_custom else "No") for 
+                             user_beyblade_id, id, name, is_custom in results]
         print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
     else:
         print(f"No Beyblades found for user: {user_name}")
