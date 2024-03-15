@@ -23,7 +23,8 @@ CREATE PROCEDURE sp_add_beyblade(
     IN _energy_ring_id VARCHAR(20),
     IN _fusion_wheel_id VARCHAR(20),
     IN _spin_track_id VARCHAR(20),
-    IN _performance_tip_id VARCHAR(20)
+    IN _performance_tip_id VARCHAR(20),
+    IN _bey_condition VARCHAR(100)
 )
 BEGIN
     DECLARE _beyblade_id VARCHAR(10);
@@ -58,8 +59,8 @@ BEGIN
     END IF;
 
     -- Link the Beyblade (new or existing) to the user
-    INSERT INTO beycollection (user_ID, beyblade_ID)
-    VALUES (_user_id, _beyblade_id);
+    INSERT INTO beycollection (user_ID, beyblade_ID, bey_condition)
+    VALUES (_user_id, _beyblade_id, _bey_condition);
     -- Note that user_beyblade_ID attribute of 'beycollection' table is auto-
     -- incremented INT, so
     -- don't need to explicitly provide a value for this when inserting

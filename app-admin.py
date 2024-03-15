@@ -171,23 +171,23 @@ def view_users():
     finally:
         cursor.close()
 
-
 def view_user_beyblades(user_name):
     """
     Queries the database for all Beyblades owned by a specific user and prints
-    their beyblade_ID, name, custom status, and Beyblade-Player ID in a 
-    well-formatted table.
+    their beyblade_ID, name, custom status, and Beyblade-Player ID, along with 
+    the condition of each Beyblade in a well-formatted table.
 
     Arguments:
         user_name (str) - The username of the user.
-    Returns: Prints the Beyblade ID, Name, Custom Status, and Beyblade-Player 
-             ID of the user's Beyblades
+    Returns: Prints the Beyblade ID, Name, Custom Status, Beyblade-Player 
+             ID, and Condition of the user's Beyblades
     """
     conn = get_conn()
     cursor = conn.cursor()
 
     query = """
-    SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom
+    SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom, 
+    ub.bey_condition
     FROM beyblades b
     JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
     JOIN users u ON ub.user_ID = u.user_ID
@@ -196,18 +196,14 @@ def view_user_beyblades(user_name):
     cursor.execute(query, (user_name,))
 
     results = cursor.fetchall()
-    headers = ["Beyblade-Player ID", "Beyblade ID", "Name", "Is Custom"]
+    headers = ["Beyblade-Player ID", "Beyblade ID", "Name", "Is Custom", 
+               "Condition"]
 
     if results:
-        # Convert is_custom boolean to a more readable format (Yes/No)
         formatted_results = [
-            (user_beyblade_id,
-             id,
-             name,
-             "Yes" if is_custom else "No") for user_beyblade_id,
-            id,
-            name,
-            is_custom in results]
+            (user_beyblade_id, id, name, "Yes" if is_custom else "No", 
+             condition) for user_beyblade_id, id, name, is_custom, 
+             condition in results]
         print(tabulate(formatted_results, headers=headers, tablefmt="grid"))
     else:
         print(f"No Beyblades found for user: {user_name}")
@@ -501,7 +497,8 @@ def add_user_beyblade(
         energy_ring_id,
         fusion_wheel_id,
         spin_track_id,
-        performance_tip_id):
+        performance_tip_id,
+        bey_condition):
     """
     Adds the beyblade to the beyblades and beycollection table.
 
@@ -517,6 +514,7 @@ def add_user_beyblade(
         fusion_wheel_id (str): ID of the Fusion Wheel part.
         spin_track_id (str): ID of the Spin Track part.
         performance_tip_id (str): ID of the Performance Tip part.
+        bey_condition (str): Condition of the Beyblade being added.
 
     Return value: none.
     """
@@ -537,9 +535,9 @@ def add_user_beyblade(
         return
 
     # Now, call the stored procedure with the obtained user_id
-    sql_call_sp = "CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    sql_call_sp = "CALL sp_add_beyblade(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     data = (user_id, name, type, series, face_bolt_id, energy_ring_id,
-            fusion_wheel_id, spin_track_id, performance_tip_id)
+            fusion_wheel_id, spin_track_id, performance_tip_id, bey_condition)
     try:
         cursor.execute(sql_call_sp, data)
         conn.commit()
@@ -922,6 +920,7 @@ def show_options(username):
         fusion_wheel_id = input('Enter Fusion Wheel ID: ')
         spin_track_id = input('Enter Spin Track ID: ')
         performance_tip_id = input('Enter Performance Tip ID: ')
+        bey_condition = input('Enter Condition of Your Beyblade (i.e. Like New): ')
         add_user_beyblade(
             username,
             name,
@@ -931,7 +930,8 @@ def show_options(username):
             energy_ring_id,
             fusion_wheel_id,
             spin_track_id,
-            performance_tip_id)
+            performance_tip_id,
+            bey_condition)
         show_options(username)
     elif ans == 'd':
         # Adds a new record to battles table

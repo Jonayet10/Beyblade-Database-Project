@@ -66,6 +66,7 @@ CREATE TABLE beycollection (
     user_ID INT NOT NULL,
     -- Reference the Beyblade owned by the user
     beyblade_ID VARCHAR(10) NOT NULL,
+    bey_condition VARCHAR(100) NOT NULL,
     FOREIGN KEY (user_ID) REFERENCES users(user_ID)
         ON DELETE CASCADE, -- if user is deleted in users table, their 
         -- Beyblades are also deleted from beycollection table
