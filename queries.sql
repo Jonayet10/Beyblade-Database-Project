@@ -16,8 +16,8 @@ FROM users where username = 'gokus';
 SELECT user_ID, username, email, is_admin, date_joined
 FROM users;
 
--- Retrieves the beyblade_IDs, names, and custom statuses of beyblades of a 
--- user. 
+-- Retrieves the user_beyblade_IDs, beyblade_IDs, names, and custom 
+-- statuses of beyblades of a user. 
 SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom
 FROM beyblades b
 JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
