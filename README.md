@@ -68,6 +68,7 @@ The registered Bladers (clients) are:
 The following is a guide through the functionalities of this application:
 
 If you are a BeyAdmin:
+
     1. Select option (f) to view all Beyblades in the database
 
     2. Select option (p) to view current users in the database
