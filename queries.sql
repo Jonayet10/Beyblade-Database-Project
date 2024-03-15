@@ -18,7 +18,7 @@ FROM users;
 
 -- Retrieves the beyblade_IDs, names, and custom statuses of beyblades of a 
 -- user. 
-SELECT b.beyblade_ID, b.name, b.is_custom
+SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom
 FROM beyblades b
 JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
 JOIN users u ON ub.user_ID = u.user_ID
