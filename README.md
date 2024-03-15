@@ -46,6 +46,8 @@ If you are an admin, run
 
     $ python app-admin.py
 
+After running either of the two commands above, enter the username and password accordingly.
+
 The registered BeyAdmins (admins) are:
 
 | USER       | PASSWORD      |
@@ -60,3 +62,26 @@ The registered Bladers (clients) are:
 |------------|---------------|
 | gokus     | gokuspw        |
 | midoriyai | midoriyaipw    |
+
+# Walkthrough
+
+The following is a guide through the functionalities of this application:
+
+If you are a BeyAdmin:
+    1. Select option (f) to view all Beyblades in the database
+    2. Select option (p) to view current users in the database
+    3. Select option (g) to view Beyblades from a user's collection with a username from option (p)
+    4. Select option (h) to view all Beyblade parts in the database
+    5. Select option (i) to view parts of a Beyblade with Beyblade ID from option (f)
+    6. Select option (j) to view weight and description of a part given part ID from option (h)
+    7. Select option (l) to view all tournament names for the battles in the database
+    8. Select option (m) to view the battle results of a specific tournament name from option (l)
+    9. Select option (n) to view all battle locations in the database
+    10. Select option (o) to view the battle results  of a specific location from option (n)
+    11. Selection option (r) 
+
+If you are a Blader, then you have access to most of the options above, with the following restrictions (note different letters corresonding to different options for BeyAdmin and Blader):
+- Cannot Add a part to the database
+- Cannot add a Beyblade to the database, only to their own collection
+- Cannot add a new battle result
+- Cannot view battles by other admin/client usernames, only by location and tournament name
