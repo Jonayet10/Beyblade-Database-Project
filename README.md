@@ -82,7 +82,6 @@ If you are a BeyAdmin:
 
     7. Select option (l) to view all tournament names for the battles in the database
     
-    
     9. Select option (n) to view all battle locations in the database
 
     10. Select option (o) to view the battle results  of a specific location from option (n)
