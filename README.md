@@ -1,5 +1,36 @@
 # Beyblade-Database-Project
 
-This project features a database to store Beyblade parts from the Beyblade Metal Saga (Metal Fusion, Masters, and Fury). The functionalities of this database include (1) cataloging various aspects of Beyblade parts (generation, weight, qualities), (2) recording Beyblade battle outcomes (Beyblades and parts used, outcomes), (3) and serving as a respository for Beyblade enthusiasts and competitors who want to analyze and optimize Beyblade configurations for strategic advantages.
+The GitHub repository establishes a project that constructs a Beyblade database, cataloging Beybalde parts, configurations, and battle outcomes. It features a dual command-line interface, one tailored for a Blader (client) and another for a BeyAdmin (administrator), enabling users to execute a wide variety of functions. These include account creatino, strategic Beyblade assembly based on accessible data, management of their personal Beyblade collection, as well as the analysis of battle statistics for various Beyblades and tournaments.
 
-Admins can add new Beyblades and parts to the database, as well as record information regarding tournament and battle results. Clients can customize Beyblades, save them in their account, and find information and specs on Beyblades and parts.
+Before running this program, make sure to install Python MySQL Connector and tabulate with pip. Also, note that this program was tested on MySQL Version 8.2.0.
+
+# Setup Instructions
+
+In your computer's command line, do the following:
+
+$ mysql --local-infile=1 -u root -p
+
+and enter your password accordingly, assuming root is the username being used to log into the MySQL database server and 'mysql' is the command-line client.
+
+Create and use database in the MySQL command-line interface:
+
+mysql> CREATE DATABASE beybladedb;
+
+mysql> USE beybladedb;
+
+Run the following commands to establish the backend of the project:
+
+mysql> SOURCE setup.sql;
+
+mysql> SOURCE load.sql
+
+mysql> SOURCE setup-passwords.sql;
+
+mysql> SOURCE setup-routines.sql;
+
+mysql> SOURCE grant-permissions.sql;
+
+mysql> SOURCE queries.sql;
+
+# Instructions for Running Python Program
+
