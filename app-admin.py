@@ -908,7 +908,7 @@ def quit_ui():
     Quits the program, printing a good bye message to the user.
     """
     print('\n----------------------------------------------------------------\n')
-    print('Thank you for keeping the Beyblade legacy ablaze. May the Beyblade spirit be with you. Goodbye!')
+    print('Thank you for managing our community of Bladers. Goodbye, and keep spinning forward!')
     print('\n----------------------------------------------------------------\n')
     exit()
 

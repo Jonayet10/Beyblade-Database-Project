@@ -46,9 +46,17 @@ If you are an admin, run
 
     $ python app-admin.py
 
-The registered admins are:
+The registered BeyAdmins (admins) are:
 
 | USER       | PASSWORD      |
 |------------|---------------|
 | jlavin     | jlavinpw      |
 | alinazhang | alinazhangpw  |
+| dpasha     | dpashapw      |
+
+The registered Bladers (clients) are:
+
+| USER       | PASSWORD      |
+|------------|---------------|
+| gokus     | gokuspw        |
+| midoriyai | midoriyaipw    |
