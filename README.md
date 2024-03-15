@@ -8,43 +8,43 @@ Before running this program, make sure to install Python MySQL Connector and tab
 
 In your computer's command line, do the following:
 
-$ mysql --local-infile=1 -u root -p
+    $ mysql --local-infile=1 -u root -p
 
 and enter your password accordingly, assuming root is the username being used to log into the MySQL database server and 'mysql' is the command-line client.
 
 Create and use database in the MySQL command-line interface:
 
-mysql> CREATE DATABASE beybladedb;
+    mysql> CREATE DATABASE beybladedb;
 
-mysql> USE beybladedb;
+    mysql> USE beybladedb;
 
 Run the following commands to establish the backend of the project:
 
-mysql> SOURCE setup.sql;
+    mysql> SOURCE setup.sql;
 
-mysql> SOURCE load.sql
+    mysql> SOURCE load.sql
 
-mysql> SOURCE setup-passwords.sql;
+    mysql> SOURCE setup-passwords.sql;
 
-mysql> SOURCE setup-routines.sql;
+    mysql> SOURCE setup-routines.sql;
 
-mysql> SOURCE grant-permissions.sql;
+    mysql> SOURCE grant-permissions.sql;
 
-mysql> SOURCE queries.sql;
+    mysql> SOURCE queries.sql;
 
 # Instructions for Running Python Program
 
 Quit out of MySQL CLI:
 
-mysql> quit
+    mysql> quit
 
 If you are a client, run
 
-$ python app-client.py
+    $ python app-client.py
 
 If you are an admin, run
 
-$ python app-admin.py
+    $ python app-admin.py
 
 The registered admins are:
 
