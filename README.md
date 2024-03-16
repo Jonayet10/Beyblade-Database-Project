@@ -83,31 +83,36 @@ If you are a BeyAdmin:
 
     6. Select option (j) to view weight and description of a part given part ID from option (h)
 
-    7. Select option (l) to view all tournament names for the battles in the database
+    7. Select option (k) to view the heaviest Beyblade for a Beyblade type in the database
+
+    8. Select option (l) to view all tournament names for the battles in the database
+
+    9. Select option (m) to view all battle results of a specific tournament name from option (8)
     
-    9. Select option (n) to view all battle locations in the database
+    10. Select option (n) to view all battle locations in the database
 
-    10. Select option (o) to view the battle results of a specific location from option (n)
+    11. Select option (o) to view the battle results of a specific location from option (n)
 
-    11. Select option (r) to view the battle results for a user with username from option (p)
+    12. Select option (r) to view the battle results for a user with username from option (p)
 
-    12. Select option (s) to view Beyblade leaderboard
+    13. Select option (s) to view Beyblade leaderboard
 
-    13. Select option (a) to add a part to the database using the format seen from option (h)
+    14. Select option (a) to add a part to the database using the format seen from option (h)
 
-    14. Select option (b) to add a new Beyblade to the database using the format seen from option (f)
+    15. Select option (b) to add a new Beyblade to the database using the format seen from option (f) and part IDs from option (h)
 
-    15. Select option (c) to add a new Beyblade to your collection
+    16. Select option (c) to add a new Beyblade to your collection
 
-    16. Select option (d) to add a new battle result using format seen from option (m), user ID from option (p) and Beyblade-Player ID from option (g)
+    17. Select option (d) to add a new battle result using format seen from option (m), user ID from option (p) and Beyblade-Player ID from option (g)
 
-    17. Select option (e) to add a new user to the database
+    18. Select option (e) to add a new user to the database
 
-    18. Select option (q) to quit
+    19. Select option (q) to quit
 
 If you are a Blader, then you have access to most of the options above, with the following restrictions (note different letters 
 corresonding to different options for BeyAdmin and Blader):
-- Cannot Add a part to the database
+- Cannot add a part to the database
 - Cannot add a Beyblade to the database, only to their own collection
 - Cannot add a new battle result
 - Cannot view battles by other admin/client usernames, only by location and tournament name
+- Cannot view information of users in the database

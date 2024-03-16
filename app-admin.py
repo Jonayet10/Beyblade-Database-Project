@@ -940,8 +940,8 @@ def show_options(username):
         location = input('Enter location: ')
         player1_id = input('Enter Player 1 ID: ')
         player2_id = input('Enter Player 2 ID: ')
-        player1_beyblade_id = input('Enter Player 1 Beyblade ID: ')
-        player2_beyblade_id = input('Enter Player 2 Beyblade ID: ')
+        player1_beyblade_id = input('Enter Beyblade-Player ID: ')
+        player2_beyblade_id = input('Enter Beyblade-Player ID: ')
         winner_id = input('Enter Winner ID (leave blank if draw): ')
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(
