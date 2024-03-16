@@ -29,7 +29,7 @@ SELECT * FROM beyblades;
 
 -- Retrieves all battle results related to the current user from the 
 -- battles table. 
-SELECT b.battle_ID, b.tournament_name, b.date, b.location, 
+SELECT b.battle_ID, b.tournament_name, b.battle_date, b.location, 
         u1.username AS Player1_Username, u2.username AS Player2_Username, 
         bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
         b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -44,7 +44,7 @@ WHERE u1.username = 'gokus' OR u2.username = 'gokus';
 
 -- Retrieves all battle results related to a specified tournament from the
 -- battles table. 
-SELECT b.battle_ID, b.date, b.location, 
+SELECT b.battle_ID, b.battle_date, b.location, 
         u1.username AS Player1_Username, u2.username AS Player2_Username, 
         bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
         b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -59,7 +59,7 @@ WHERE b.tournament_name = 'WBBA Prelim';
 
 -- Retrieves all battle results related to a specified tournament from the
 -- given location. 
-SELECT b.battle_ID, b.tournament_name, b.date, 
+SELECT b.battle_ID, b.tournament_name, b.battle_date, 
         u1.username AS Player1_Username, u2.username AS Player2_Username, 
         bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name, 
         b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -111,7 +111,7 @@ FROM battles
 ORDER BY location;
 
 -- Select and order all beyblades based off battle wins. 
-SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(*) as wins
+SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(b.battle_ID) as wins
 FROM battles b
 INNER JOIN beycollection ub ON b.winner_ID = ub.user_beyblade_ID
 INNER JOIN beyblades bb ON ub.beyblade_ID = bb.beyblade_ID
