@@ -115,4 +115,4 @@ corresonding to different options for BeyAdmin and Blader):
 - Cannot add a Beyblade to the database, only to their own collection
 - Cannot add a new battle result
 - Cannot view battles by other admin/client usernames, only by location and tournament name
-- Cannot view information of users in the database
+- Cannot view certain information of users in the database
