@@ -24,7 +24,7 @@ Run the following commands to establish the backend of the project:
 
     mysql> SOURCE setup.sql;
 
-    mysql> SOURCE setup-load.sql
+    mysql> SOURCE load-data.sql
 
     mysql> SOURCE setup-passwords.sql;
 

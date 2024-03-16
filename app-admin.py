@@ -829,32 +829,32 @@ def show_options(username):
     print('\n')
 
     print('* Add Entities: ')
-    print('  (a) Add a part to the database')  # GOOD
-    print('  (b) Add a new Beyblade to the database')  # GOOD
+    print('  (a) Add a part to the database')  
+    print('  (b) Add a new Beyblade to the database')  
     print('  (c) Add a Beyblade to your collection')
-    print('  (d) Add a new battle result')  # GOOD
-    print('  (e) Add a new user')   # GOOD
+    print('  (d) Add a new battle result')  
+    print('  (e) Add a new user')   
     print('\n')
 
     print('* View Beyblade Information: ')
 
-    print('  (f) View all Beyblades')   # GOOD
-    print('  (g) View Beyblades from a user\'s collection')  # GOOD
-    print('  (h) View all parts in the database')  # GOOD
-    print('  (i) View parts of a Beyblade')  # GOOD
-    print('  (j) View part information')    # GOOD
-    print('  (k) View the heaviest Beyblade for a type')    # GOOD
+    print('  (f) View all Beyblades')   
+    print('  (g) View Beyblades from a user\'s collection')  
+    print('  (h) View all parts in the database')  
+    print('  (i) View parts of a Beyblade')  
+    print('  (j) View part information')    
+    print('  (k) View the heaviest Beyblade for a type')    
     print('\n')
 
     print('* View Battle Information: ')
 
-    print('  (l) View all tournament names')    # GOOD
-    print('  (m) View battle results for a tournament')  # GOOD
-    print('  (n) View all battle locations')    # GOOD
-    print('  (o) View battle results for a location')   # GOOD
-    print('  (p) View current users')   # GOOD
-    print('  (r) View battle results for a user')   # GOOD
-    print('  (s) Print Beyblades leaderboard')  # GOOD
+    print('  (l) View all tournament names')    
+    print('  (m) View battle results for a tournament')  
+    print('  (n) View all battle locations')    
+    print('  (o) View battle results for a location')   
+    print('  (p) View current users')   
+    print('  (r) View battle results for a user')   
+    print('  (s) Print Beyblades leaderboard')  
     print('\n')
 
     print('  (q) - quit')
