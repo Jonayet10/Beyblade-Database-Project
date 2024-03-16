@@ -1,4 +1,3 @@
-USE beybladedb;
 -- app_admin queries :
 
 -- Query to fetch is_admin status for a user
@@ -17,9 +16,9 @@ FROM users where username = 'gokus';
 SELECT user_ID, username, email, is_admin, date_joined
 FROM users;
 
--- Retrieves the beyblade_IDs, names, and custom statuses of beyblades of a 
--- user. 
-SELECT b.beyblade_ID, b.name, b.is_custom
+-- Retrieves the user_beyblade_IDs, beyblade_IDs, names, and custom 
+-- statuses of beyblades of a user. 
+SELECT ub.user_beyblade_ID, b.beyblade_ID, b.name, b.is_custom
 FROM beyblades b
 JOIN beycollection ub ON b.beyblade_ID = ub.beyblade_ID
 JOIN users u ON ub.user_ID = u.user_ID
@@ -112,7 +111,7 @@ FROM battles
 ORDER BY location;
 
 -- Select and order all beyblades based off battle wins. 
-SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(*) as wins
+SELECT bb.beyblade_ID, bb.name, bb.type, COUNT(b.battle_ID) as wins
 FROM battles b
 INNER JOIN beycollection ub ON b.winner_ID = ub.user_beyblade_ID
 INNER JOIN beyblades bb ON ub.beyblade_ID = bb.beyblade_ID
