@@ -81,7 +81,7 @@ CREATE TABLE battles (
     -- Name of the tournament the battle is from
     tournament_name VARCHAR(250) NOT NULL,
     -- Date of the battle
-    date DATETIME NOT NULL,
+    battle_date DATETIME NOT NULL,
     -- Lovation of the battle
     location VARCHAR(250) NOT NULL,
     -- References to the players and their Beyblades invovles in the battle

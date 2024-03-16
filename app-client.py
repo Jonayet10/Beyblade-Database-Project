@@ -189,7 +189,7 @@ def view_all_battle_results_for_user(user_name):
 
     # SQL query to fetch battle results for the given user
     query = """
-    SELECT b.battle_ID, b.tournament_name, b.date, b.location,
+    SELECT b.battle_ID, b.tournament_name, b.battle_date, b.location,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -326,7 +326,7 @@ def view_battle_results_for_tournament(tournament_name):
 
     # SQL query to fetch battle results for the given tournament name
     query = """
-    SELECT b.battle_ID, b.date, b.location,
+    SELECT b.battle_ID, b.battle_date, b.location,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -375,7 +375,7 @@ def view_battle_results_for_location(location):
 
     # SQL query to fetch battle results for the given location
     query = """
-    SELECT b.battle_ID, b.tournament_name, b.date,
+    SELECT b.battle_ID, b.tournament_name, b.battle_date,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID

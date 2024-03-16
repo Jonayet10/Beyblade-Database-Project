@@ -113,14 +113,14 @@ def add_beyblade(beyblade_ID, name, type, is_custom, series, face_bolt_ID,
         print(f"Error: {err}")
 
 
-def add_battle(tournament_name, date, location, player1_id, player2_id,
+def add_battle(tournament_name, battle_date, location, player1_id, player2_id,
                player1_beyblade_id, player2_beyblade_id, winner_id):
     """
     Records a new battle result in the database.
 
     Arguments:
         tournament_name (str): Name of the tournament.
-        date (str or datetime): Date when the battle occurred.
+        battle_date (str or datetime): Date when the battle occurred.
         location (str): Location of the battle.
         player1_id (int): User ID of the first player.
         player2_id (int): User ID of the second player.
@@ -132,7 +132,7 @@ def add_battle(tournament_name, date, location, player1_id, player2_id,
     """
     cursor = conn.cursor()
     try:
-        cursor.callproc('sp_record_battle', (tournament_name, date, location,
+        cursor.callproc('sp_record_battle', (tournament_name, battle_date, location,
                                              player1_id, player2_id,
                                              player1_beyblade_id,
                                              player2_beyblade_id, winner_id))
@@ -287,7 +287,7 @@ def view_all_battle_results_for_user(user_name):
 
     # SQL query to fetch battle results for the given user
     query = """
-    SELECT b.battle_ID, b.tournament_name, b.date, b.location,
+    SELECT b.battle_ID, b.tournament_name, b.battle_date, b.location,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -334,7 +334,7 @@ def view_battle_results_for_tournament(tournament_name):
 
     # SQL query to fetch battle results for the given tournament name
     query = """
-    SELECT b.battle_ID, b.date, b.location,
+    SELECT b.battle_ID, b.battle_date, b.location,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -383,7 +383,7 @@ def view_battle_results_for_location(location):
 
     # SQL query to fetch battle results for the given location
     query = """
-    SELECT b.battle_ID, b.tournament_name, b.date,
+    SELECT b.battle_ID, b.tournament_name, b.battle_date,
            u1.username AS Player1_Username, u2.username AS Player2_Username,
            bb1.name AS Player1_Beyblade_Name, bb2.name AS Player2_Beyblade_Name,
            b.player1_beyblade_ID, b.player2_beyblade_ID, b.winner_ID
@@ -936,7 +936,7 @@ def show_options(username):
     elif ans == 'd':
         # Adds a new record to battles table
         tournament_name = input('Enter tournament name: ')
-        date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
+        battle_date = input('Enter date of the battle (YYYY-MM-DD HH:MM:SS): ')
         location = input('Enter location: ')
         player1_id = input('Enter Player 1 ID: ')
         player2_id = input('Enter Player 2 ID: ')
@@ -946,7 +946,7 @@ def show_options(username):
         winner_id = winner_id if winner_id.strip() != '' else None
         add_battle(
             tournament_name,
-            date,
+            battle_date,
             location,
             player1_id,
             player2_id,

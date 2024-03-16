@@ -92,7 +92,7 @@ DELIMITER !
 
 CREATE PROCEDURE sp_record_battle(
     IN _tournament_name VARCHAR(250), 
-    IN _date DATETIME, 
+    IN _battle_date DATETIME, 
     IN _location VARCHAR(250), 
     IN _player1_ID INT, 
     IN _player2_ID INT, 
@@ -101,9 +101,9 @@ CREATE PROCEDURE sp_record_battle(
     IN _winner_ID INT
 )
 BEGIN
-    INSERT INTO battles (tournament_name, date, location, player1_ID, 
+    INSERT INTO battles (tournament_name, battle_date, location, player1_ID, 
         player2_ID, player1_beyblade_ID, player2_beyblade_ID, winner_ID)
-    VALUES (_tournament_name, _date, _location, _player1_ID, _player2_ID, 
+    VALUES (_tournament_name, _battle_date, _location, _player1_ID, _player2_ID, 
         _player1_beyblade_ID, _player2_beyblade_ID, _winner_ID);
 END !
 
